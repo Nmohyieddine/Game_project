@@ -62,7 +62,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 118
   m_CollisionDetection: 0
 --- !u!114 &593867389129847209
 MonoBehaviour:
@@ -76,6 +76,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52ddb472f32a1ef429d05400ff9776c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TranCar: {fileID: 589341291496904198}
   rbCar: {fileID: 613062635746481938}
   Forwardforce: -10
 --- !u!1 &592514906479824218

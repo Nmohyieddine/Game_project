@@ -16,7 +16,7 @@ public class TextScripte : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Scoretext.text=Scripte4DB.Showquestion(1);
+        //Scoretext.text=Scripte4DB.Showquestion(1);
         
     }
 }

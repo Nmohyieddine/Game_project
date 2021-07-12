@@ -7,14 +7,15 @@ using Mono.Data.Sqlite;
 public class Scripte4DB : MonoBehaviour
 {
 
-    private static string dbName =@"Data Source=/home/mohyi/Desktop/Game_project/Projet Brackeys/Assets/Scripte/QuesionsDB.db,Version=3";
+    private static string dbName =@"Data Source=C:\Users\zmiloudi\Desktop\Game_project\Projet Brackeys\Assets\Scripte\QuesionsDB.db,Version=3";
     public static string Val;
     // Start is called before the first frame update
     void Start()
     {
         CreateDB();
-        Addanswer(1,"oui");
-        //Showquestion();
+        //Addanswer(1,"oui");
+        Showquestion(1);
+        
         
     }
 
@@ -68,16 +69,13 @@ public class Scripte4DB : MonoBehaviour
 
             using(var command = connection.CreateCommand()){
 
-                command.CommandText="SELECT * FROM Questions;";
+                command.CommandText="SELECT * FROM Reponses WHERE ID='IDquestion';";
+
                 using(IDataReader reader = command.ExecuteReader()){
 
                     while(reader.Read()){
 
-                        if((int)reader["ID"]==IDquestion){
-
-                            Val=(string)reader["question"];
-
-                        }
+                       UnityEngine.Debug.Log(reader.GetString(1));
 
                     }
                     reader.Close();

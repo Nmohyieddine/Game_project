@@ -8,6 +8,8 @@ public class TileManager : MonoBehaviour
 {
     public GameObject [] tilePrefabs;
 
+    public Transform Trantile1;
+
     //public GameObject titlefirst;
 
     // Start is called before the first frame update
@@ -26,7 +28,7 @@ public class TileManager : MonoBehaviour
 
     public List<GameObject> activeTiles = new List<GameObject>();
 
-    public int posCreation =75;
+    public int posCreation =10;
 
 
     
@@ -35,8 +37,9 @@ public class TileManager : MonoBehaviour
     {
         
         
-        tilePrefabs[0].transform.position=new Vector3(0,0,150);
-        SpawnTile(0);
+       
+
+        SpawnTile(0,150);
         
 
     }
@@ -65,7 +68,16 @@ public class TileManager : MonoBehaviour
     public void SpawnTile(int tileIndex)
     {
 
-        GameObject go=Instantiate(tilePrefabs[tileIndex],transform.forward*zSpaw,transform.rotation);
+        GameObject go=Instantiate(tilePrefabs[tileIndex],transform.forward*(zSpaw+150),transform.rotation);
+        
+        zSpaw +=titleLentgth;
+
+        activeTiles.Add(go);
+
+    }
+    public void SpawnTile(int tileIndex,int possition){
+
+         GameObject go=Instantiate(tilePrefabs[tileIndex],transform.forward*possition,transform.rotation);
         
         zSpaw +=titleLentgth;
 

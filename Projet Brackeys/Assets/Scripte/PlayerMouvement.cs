@@ -6,10 +6,10 @@ using UnityEngine;
 public class PlayerMouvement : MonoBehaviour {
 
 	// Use this for initialization
-	public Rigidbody rb;
-	public Transform Player;
-	public float Forwardforce=2000f;
-	public float Sideforce=500f;
+	public Rigidbody Gbakarb;
+	public Transform Gbaka;
+	public static float Forwardforce=50f;
+	public static float Sideforce=5f;
 
 	public bool RightAction=false;
 	public bool LeftAction=false;
@@ -19,7 +19,6 @@ public class PlayerMouvement : MonoBehaviour {
 		//Debug.Log("hello world");
 		//rb.AddForce(200 , 0 , 500);
 
-		
 
 
 		
@@ -37,14 +36,18 @@ public class PlayerMouvement : MonoBehaviour {
 
 		}
 
-		rb.AddForce(0 , 0 ,Forwardforce);
+		//Gbakarb.AddForce(0 , 0 ,Forwardforce);
+
+		transform.Translate(Vector3.forward * Forwardforce * Time.deltaTime);
+
+
 
 
 
 
 	}
 	
-	// Update is called once per frame
+		// Update is called once per frame
 	void FixedUpdate () {
 
 
@@ -52,32 +55,40 @@ public class PlayerMouvement : MonoBehaviour {
 		
 		if(RightAction == true){
 
-			rb.AddForce(Sideforce, 0 ,0,ForceMode.VelocityChange);
+			//Gbakarb.AddForce(Sideforce, 0 ,0,ForceMode.VelocityChange);
+			transform.Translate(UnityEngine.Vector3.right * Forwardforce * Time.deltaTime);
+
 			RightAction=false;
 
 		}
 
 		if(LeftAction == true){
 
-			rb.AddForce(-Sideforce, 0 ,0,ForceMode.VelocityChange);
+			//Gbakarb.AddForce(-Sideforce, 0 ,0,ForceMode.VelocityChange);
+			transform.Translate(UnityEngine.Vector3.left* Forwardforce * Time.deltaTime);
+
 			LeftAction=false;
 
 		}
 
-		if(Player.position.x>7.3){
+		if(Gbaka.position.x>7.3){
 
-			rb.AddForce(-Sideforce/2,0,0,ForceMode.VelocityChange);
-			rb.AddForce(0 , 0 ,-Forwardforce);
+			//Gbakarb.AddForce(-Sideforce/2,0,0,ForceMode.VelocityChange);
+			//Gbakarb.AddForce(0 , 0 ,-Forwardforce);
+			transform.Translate(UnityEngine.Vector3.left* Forwardforce * Time.deltaTime);
+
 
 			
 
 			
 		}
 
-		if(Player.position.x<-7.3){
+		if(Gbaka.position.x<-7.3){
 
-			rb.AddForce(Sideforce/2,0,0,ForceMode.VelocityChange);
-			rb.AddForce(0 , 0 ,-Forwardforce);
+			//Gbakarb.AddForce(Sideforce/2,0,0,ForceMode.VelocityChange);
+			//Gbakarb.AddForce(0 , 0 ,-Forwardforce);
+			transform.Translate(UnityEngine.Vector3.right* Forwardforce * Time.deltaTime);
+
 
 			
 

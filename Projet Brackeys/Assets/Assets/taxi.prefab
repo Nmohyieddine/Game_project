@@ -135,5 +135,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52ddb472f32a1ef429d05400ff9776c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TranCar: {fileID: 2238839409015072815}
   rbCar: {fileID: 2238839409015072812}
   Forwardforce: 2000
