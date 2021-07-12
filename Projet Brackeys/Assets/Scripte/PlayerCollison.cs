@@ -7,15 +7,14 @@ public class PlayerCollison : MonoBehaviour {
 	public PlayerMouvement playerMouvement;
 	public static int counter;
 
-	public Text Scoretext;
 
-	public Transform Player;
+	
 
 
 
 	void Update(){
 
-		Scoretext.text="Score:" + counter.ToString();
+		
 	}
 
 	void OnCollisionEnter(Collision infocollider)
@@ -54,7 +53,9 @@ public class PlayerCollison : MonoBehaviour {
 			
 				counter=counter+10;
 
-				Debug.Log(counter);
+				
+
+				
 
 			}
 
