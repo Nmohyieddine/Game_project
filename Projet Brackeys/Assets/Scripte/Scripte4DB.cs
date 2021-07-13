@@ -14,7 +14,7 @@ public class Scripte4DB : MonoBehaviour
     {
         CreateDB();
         //Addanswer(1,"oui");
-        Showquestion(1);
+       
         
         
     }
@@ -69,13 +69,13 @@ public class Scripte4DB : MonoBehaviour
 
             using(var command = connection.CreateCommand()){
 
-                command.CommandText="SELECT * FROM Reponses WHERE ID='IDquestion';";
+                command.CommandText="SELECT * FROM Questions WHERE ID = "+IDquestion+";";
 
                 using(IDataReader reader = command.ExecuteReader()){
 
                     while(reader.Read()){
 
-                       UnityEngine.Debug.Log(reader.GetString(1));
+                      return (string)reader["question"];
 
                     }
                     reader.Close();

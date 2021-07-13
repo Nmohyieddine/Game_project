@@ -44,6 +44,8 @@
      <Compile Include="Assets\Scripte\TextScripte.cs" />
      <Compile Include="Assets\diamondCollision.cs" />
      <Compile Include="Assets\Scripte\carsMouvement.cs" />
+     <Compile Include="Assets\Scripte\PanelScripte.cs" />
+     <Compile Include="Assets\Scripte\ButtonsScripte.cs" />
      <None Include="Assets\Fantasy Skybox FREE\Readme.txt" />
     <Reference Include="UnityEngine">
         <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
