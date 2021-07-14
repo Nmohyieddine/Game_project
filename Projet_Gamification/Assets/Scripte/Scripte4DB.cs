@@ -7,7 +7,7 @@ using Mono.Data.Sqlite;
 public class Scripte4DB : MonoBehaviour
 {
 
-    private static string dbName =@"Data Source=C:\Users\zmiloudi\Desktop\Game_project\Projet Brackeys\Assets\Scripte\QuesionsDB.db,Version=3";
+    private static string dbName =@"Data Source=C:\Users\zmiloudi\Desktop\Game_project\Projet_Gamification\Assets\Scripte\QuesionsDB.db,Version=3";
     public static string Val;
     // Start is called before the first frame update
     void Start()

@@ -1,4 +1,5 @@
 ﻿
+using System.Threading;
 using System.Net.Mime;
 using System.Diagnostics;
 using UnityEngine;
@@ -14,15 +15,28 @@ public class PlayerCollison : MonoBehaviour {
 
 	public GameObject quizPanel;
 
+	public GameObject PanelExplication;
+
+	public GameObject PausePanel;
+
 	public Text popuptext;
 
 	public Text quizQuestion;
+
+	public Text Textetoile;
+
+	public Text Textdiamond;
+
+	
 
 
 	
 	void Start(){
 		popPanel.SetActive(false);
 		quizPanel.SetActive(false);
+		PanelExplication.SetActive(false);
+		PausePanel.SetActive(false);
+
 		
 
 	}
@@ -68,13 +82,29 @@ public class PlayerCollison : MonoBehaviour {
 				Destroy(other.gameObject);
 			
 				counterdiamond=counterdiamond+1;
-				popuptext.text="X"+counterdiamond.ToString();
-				quizQuestion.text=Scripte4DB.Showquestion(3);
+
+				Textdiamond.text=counterdiamond.ToString();
 
 
+				popuptext.text=counterdiamond.ToString()+" X";
 
-				popPanel.SetActive(true);
+				if(counterdiamond ==1 ){
+
+					PanelExplication.SetActive(true);
+					Time.timeScale = 0f;
+
+
+				}
+
+				//quizQuestion.text=Scripte4DB.Showquestion(1);
+
+
+				//popPanel.SetActive(true);
+
 				//quizPanel.SetActive(true);
+
+
+				
 
 
 
@@ -89,7 +119,8 @@ public class PlayerCollison : MonoBehaviour {
 			}if(other.gameObject.layer == 11){
 
 				Destroy(other.gameObject);
-				counterstars=counterstars+1;
+				counterstars=counterstars+10;
+				Textetoile.text=counterstars.ToString();
 
 			}
 
