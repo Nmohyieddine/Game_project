@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
-import { Button, Col, Row } from 'reactstrap';
+import React from 'react';
+import { connect } from 'react-redux';
+import { Button, Col, Progress, Row, Table } from 'reactstrap';
 import {
   CacheMetrics,
   DatasourceMetrics,
@@ -9,112 +10,135 @@ import {
   JvmThreads,
   EndpointsRequestsMetrics,
   SystemMetrics,
-  Translate,
+  Translate
 } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { APP_TIMESTAMP_FORMAT, APP_TWO_DIGITS_AFTER_POINT_NUMBER_FORMAT, APP_WHOLE_NUMBER_FORMAT } from 'app/config/constants';
-import { getSystemMetrics, getSystemThreadDump } from '../administration.reducer';
-import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { systemMetrics, systemThreadDump } from '../administration.reducer';
+import { IRootState } from 'app/shared/reducers';
 
-export const MetricsPage = () => {
-  const dispatch = useAppDispatch();
-  const metrics = useAppSelector(state => state.administration.metrics);
-  const isFetching = useAppSelector(state => state.administration.loading);
-  const threadDump = useAppSelector(state => state.administration.threadDump);
+export interface IMetricsPageProps extends StateProps, DispatchProps {}
 
-  useEffect(() => {
-    dispatch(getSystemMetrics());
-    dispatch(getSystemThreadDump());
-  }, []);
+export interface IMetricsPageState {
+  showModal: boolean;
+}
 
-  const getMetrics = () => {
-    if (!isFetching) {
-      dispatch(getSystemMetrics());
-      dispatch(getSystemThreadDump());
+export class MetricsPage extends React.Component<IMetricsPageProps, IMetricsPageState> {
+  state: IMetricsPageState = {
+    showModal: false
+  };
+
+  componentDidMount() {
+    this.props.systemMetrics();
+    this.props.systemThreadDump();
+  }
+
+  getMetrics = () => {
+    if (!this.props.isFetching) {
+      this.props.systemMetrics();
+      this.props.systemThreadDump();
     }
   };
 
-  return (
-    <div>
-      <h2 id="metrics-page-heading" data-cy="metricsPageHeading">
-        Application Metrics
-      </h2>
-      <p>
-        <Button onClick={getMetrics} color={isFetching ? 'btn btn-danger' : 'btn btn-primary'} disabled={isFetching}>
-          <FontAwesomeIcon icon="sync" />
-          &nbsp;
-          <Translate component="span" contentKey="health.refresh.button">
-            Refresh
-          </Translate>
-        </Button>
-      </p>
-      <hr />
+  render() {
+    const { metrics, threadDump, isFetching } = this.props;
+    return (
+      <div>
+        <h2 id="metrics-page-heading">Application Metrics</h2>
+        <p>
+          <Button onClick={this.getMetrics} color={isFetching ? 'btn btn-danger' : 'btn btn-primary'} disabled={isFetching}>
+            <FontAwesomeIcon icon="sync" />
+            &nbsp;
+            <Translate component="span" contentKey="health.refresh.button">
+              Refresh
+            </Translate>
+          </Button>
+        </p>
+        <hr />
 
-      <Row>
-        <Col sm="12">
-          <h3>JVM Metrics</h3>
+        <Row>
+          <Col sm="12">
+            <h3>JVM Metrics</h3>
+            <Row>
+              <Col md="4">
+                {metrics && metrics.jvm ? <JvmMemory jvmMetrics={metrics.jvm} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT} /> : ''}
+              </Col>
+              <Col md="4">{threadDump ? <JvmThreads jvmThreads={threadDump} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT} /> : ''}</Col>
+              <Col md="4">
+                {metrics && metrics.processMetrics ? (
+                  <SystemMetrics
+                    systemMetrics={metrics.processMetrics}
+                    wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}
+                    timestampFormat={APP_TIMESTAMP_FORMAT}
+                  />
+                ) : (
+                  ''
+                )}
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+
+        {metrics && metrics.garbageCollector ? (
+          <GarbageCollectorMetrics garbageCollectorMetrics={metrics.garbageCollector} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT} />
+        ) : (
+          ''
+        )}
+        {metrics && metrics['http.server.requests'] ? (
+          <HttpRequestMetrics
+            requestMetrics={metrics['http.server.requests']}
+            twoDigitAfterPointFormat={APP_TWO_DIGITS_AFTER_POINT_NUMBER_FORMAT}
+            wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}
+          />
+        ) : (
+          ''
+        )}
+        {metrics && metrics.endpointsRequests ? (
+          <EndpointsRequestsMetrics endpointsRequestsMetrics={metrics.endpointsRequests} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT} />
+        ) : (
+          ''
+        )}
+
+        {metrics.cache ? (
           <Row>
-            <Col md="4">
-              {metrics && metrics.jvm ? <JvmMemory jvmMetrics={metrics.jvm} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT} /> : ''}
-            </Col>
-            <Col md="4">{threadDump ? <JvmThreads jvmThreads={threadDump} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT} /> : ''}</Col>
-            <Col md="4">
-              {metrics && metrics.processMetrics ? (
-                <SystemMetrics
-                  systemMetrics={metrics.processMetrics}
-                  wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}
-                  timestampFormat={APP_TIMESTAMP_FORMAT}
-                />
-              ) : (
-                ''
-              )}
+            <Col sm="12">
+              <CacheMetrics cacheMetrics={metrics.cache} twoDigitAfterPointFormat={APP_TWO_DIGITS_AFTER_POINT_NUMBER_FORMAT} />
             </Col>
           </Row>
-        </Col>
-      </Row>
+        ) : (
+          ''
+        )}
 
-      {metrics && metrics.garbageCollector ? (
-        <GarbageCollectorMetrics garbageCollectorMetrics={metrics.garbageCollector} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT} />
-      ) : (
-        ''
-      )}
-      {metrics && metrics['http.server.requests'] ? (
-        <HttpRequestMetrics
-          requestMetrics={metrics['http.server.requests']}
-          twoDigitAfterPointFormat={APP_TWO_DIGITS_AFTER_POINT_NUMBER_FORMAT}
-          wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}
-        />
-      ) : (
-        ''
-      )}
-      {metrics && metrics.services ? (
-        <EndpointsRequestsMetrics endpointsRequestsMetrics={metrics.services} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT} />
-      ) : (
-        ''
-      )}
+        {metrics.databases && JSON.stringify(metrics.databases) !== '{}' ? (
+          <Row>
+            <Col sm="12">
+              <DatasourceMetrics
+                datasourceMetrics={metrics.databases}
+                twoDigitAfterPointFormat={APP_TWO_DIGITS_AFTER_POINT_NUMBER_FORMAT}
+              />
+            </Col>
+          </Row>
+        ) : (
+          ''
+        )}
+      </div>
+    );
+  }
+}
 
-      {metrics.cache ? (
-        <Row>
-          <Col sm="12">
-            <CacheMetrics cacheMetrics={metrics.cache} twoDigitAfterPointFormat={APP_TWO_DIGITS_AFTER_POINT_NUMBER_FORMAT} />
-          </Col>
-        </Row>
-      ) : (
-        ''
-      )}
+const mapStateToProps = (storeState: IRootState) => ({
+  metrics: storeState.administration.metrics,
+  isFetching: storeState.administration.loading,
+  threadDump: storeState.administration.threadDump
+});
 
-      {metrics.databases && JSON.stringify(metrics.databases) !== '{}' ? (
-        <Row>
-          <Col sm="12">
-            <DatasourceMetrics datasourceMetrics={metrics.databases} twoDigitAfterPointFormat={APP_TWO_DIGITS_AFTER_POINT_NUMBER_FORMAT} />
-          </Col>
-        </Row>
-      ) : (
-        ''
-      )}
-    </div>
-  );
-};
+const mapDispatchToProps = { systemMetrics, systemThreadDump };
 
-export default MetricsPage;
+type StateProps = ReturnType<typeof mapStateToProps>;
+type DispatchProps = typeof mapDispatchToProps;
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(MetricsPage);

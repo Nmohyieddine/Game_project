@@ -1,28 +1,48 @@
-import React, { useLayoutEffect } from 'react';
+import React from 'react';
+import { connect } from 'react-redux';
 
-import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { IRootState } from 'app/shared/reducers';
 import { logout } from 'app/shared/reducers/authentication';
 
-export const Logout = () => {
-  const logoutUrl = useAppSelector(state => state.authentication.logoutUrl);
-  const idToken = useAppSelector(state => state.authentication.idToken);
-  const dispatch = useAppDispatch();
+export interface ILogoutProps extends StateProps, DispatchProps {
+  idToken: string;
+  logoutUrl: string;
+}
 
-  useLayoutEffect(() => {
-    dispatch(logout());
+export class Logout extends React.Component<ILogoutProps> {
+  componentDidMount() {
+    this.props.logout();
+  }
+
+  render() {
+    const logoutUrl = this.props.logoutUrl;
     if (logoutUrl) {
       // if Keycloak, logoutUrl has protocol/openid-connect in it
-      window.location.href = logoutUrl.includes('/protocol')
-        ? logoutUrl + '?redirect_uri=' + window.location.origin
-        : logoutUrl + '?id_token_hint=' + idToken + '&post_logout_redirect_uri=' + window.location.origin;
+      window.location.href =
+        logoutUrl.indexOf('/protocol') > -1
+          ? logoutUrl + '?redirect_uri=' + window.location.origin
+          : logoutUrl + '?id_token_hint=' + this.props.idToken + '&post_logout_redirect_uri=' + window.location.origin;
     }
-  });
 
-  return (
-    <div className="p-5">
-      <h4>Logged out successfully!</h4>
-    </div>
-  );
-};
+    return (
+      <div className="p-5">
+        <h4>Logged out successfully!</h4>
+      </div>
+    );
+  }
+}
 
-export default Logout;
+const mapStateToProps = (storeState: IRootState) => ({
+  logoutUrl: storeState.authentication.logoutUrl,
+  idToken: storeState.authentication.idToken
+});
+
+const mapDispatchToProps = { logout };
+
+type StateProps = ReturnType<typeof mapStateToProps>;
+type DispatchProps = typeof mapDispatchToProps;
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Logout);

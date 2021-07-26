@@ -1,67 +1,77 @@
 import './header.scss';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Translate, Storage } from 'react-jhipster';
-import { Navbar, Nav, NavbarToggler, Collapse } from 'reactstrap';
+import { Navbar, Nav, NavbarToggler, NavbarBrand, Collapse } from 'reactstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+import { NavLink as Link } from 'react-router-dom';
 import LoadingBar from 'react-redux-loading-bar';
 
 import { Home, Brand } from './header-components';
 import { AdminMenu, EntitiesMenu, AccountMenu, LocaleMenu } from '../menus';
-import { useAppDispatch } from 'app/config/store';
-import { setLocale } from 'app/shared/reducers/locale';
 
 export interface IHeaderProps {
   isAuthenticated: boolean;
   isAdmin: boolean;
   ribbonEnv: string;
   isInProduction: boolean;
-  isOpenAPIEnabled: boolean;
+  isSwaggerEnabled: boolean;
   currentLocale: string;
+  onLocaleChange: Function;
 }
 
-const Header = (props: IHeaderProps) => {
-  const [menuOpen, setMenuOpen] = useState(false);
+export interface IHeaderState {
+  menuOpen: boolean;
+}
 
-  const dispatch = useAppDispatch();
-
-  const handleLocaleChange = event => {
-    const langKey = event.target.value;
-    Storage.session.set('locale', langKey);
-    dispatch(setLocale(langKey));
+export default class Header extends React.Component<IHeaderProps, IHeaderState> {
+  state: IHeaderState = {
+    menuOpen: false
   };
 
-  const renderDevRibbon = () =>
-    props.isInProduction === false ? (
+  handleLocaleChange = event => {
+    const langKey = event.target.value;
+    Storage.session.set('locale', langKey);
+    this.props.onLocaleChange(langKey);
+  };
+
+  renderDevRibbon = () =>
+    this.props.isInProduction === false ? (
       <div className="ribbon dev">
         <a href="">
-          <Translate contentKey={`global.ribbon.${props.ribbonEnv}`} />
+          <Translate contentKey={`global.ribbon.${this.props.ribbonEnv}`} />
         </a>
       </div>
     ) : null;
 
-  const toggleMenu = () => setMenuOpen(!menuOpen);
+  toggleMenu = () => {
+    this.setState({ menuOpen: !this.state.menuOpen });
+  };
 
-  /* jhipster-needle-add-element-to-menu - JHipster will add new menu items here */
+  render() {
+    const { currentLocale, isAuthenticated, isAdmin, isSwaggerEnabled, isInProduction } = this.props;
 
-  return (
-    <div id="app-header">
-      {renderDevRibbon()}
-      <LoadingBar className="loading-bar" />
-      <Navbar data-cy="navbar" dark expand="sm" fixed="top" className="jh-navbar">
-        <NavbarToggler aria-label="Menu" onClick={toggleMenu} />
-        <Brand />
-        <Collapse isOpen={menuOpen} navbar>
-          <Nav id="header-tabs" className="ml-auto" navbar>
-            <Home />
-            {props.isAuthenticated && <EntitiesMenu />}
-            {props.isAuthenticated && props.isAdmin && <AdminMenu showOpenAPI={props.isOpenAPIEnabled} />}
-            <LocaleMenu currentLocale={props.currentLocale} onClick={handleLocaleChange} />
-            <AccountMenu isAuthenticated={props.isAuthenticated} />
-          </Nav>
-        </Collapse>
-      </Navbar>
-    </div>
-  );
-};
+    /* jhipster-needle-add-element-to-menu - JHipster will add new menu items here */
 
-export default Header;
+    return (
+      <div id="app-header">
+        {this.renderDevRibbon()}
+        <LoadingBar className="loading-bar" />
+        <Navbar dark expand="sm" fixed="top" className="jh-navbar">
+          <NavbarToggler aria-label="Menu" onClick={this.toggleMenu} />
+          <Brand />
+          <Collapse isOpen={this.state.menuOpen} navbar>
+            <Nav id="header-tabs" className="ml-auto" navbar>
+              <Home />
+              {isAuthenticated && <EntitiesMenu />}
+              {isAuthenticated && isAdmin && <AdminMenu showSwagger={isSwaggerEnabled} />}
+              <LocaleMenu currentLocale={currentLocale} onClick={this.handleLocaleChange} />
+              <AccountMenu isAuthenticated={isAuthenticated} />
+            </Nav>
+          </Collapse>
+        </Navbar>
+      </div>
+    );
+  }
+}

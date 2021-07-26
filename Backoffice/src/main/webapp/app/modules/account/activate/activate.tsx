@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Row, Col, Alert } from 'reactstrap';
 import { Translate, getUrlParameter } from 'react-jhipster';
 
-import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { IRootState } from 'app/shared/reducers';
 import { activateAction, reset } from './activate.reducer';
 
 const successAlert = (
@@ -26,31 +27,48 @@ const failureAlert = (
   </Alert>
 );
 
-export const ActivatePage = (props: RouteComponentProps<{ key: any }>) => {
-  const dispatch = useAppDispatch();
-  useEffect(() => {
-    const key = getUrlParameter('key', props.location.search);
-    dispatch(activateAction(key));
-    return () => {
-      dispatch(reset());
-    };
-  }, []);
+export interface IActivateProps extends StateProps, DispatchProps, RouteComponentProps<{ key: any }> {}
 
-  const { activationSuccess, activationFailure } = useAppSelector(state => state.activate);
+export class ActivatePage extends React.Component<IActivateProps> {
+  componentWillUnmount() {
+    this.props.reset();
+  }
 
-  return (
-    <div>
-      <Row className="justify-content-center">
-        <Col md="8">
-          <h1>
-            <Translate contentKey="activate.title">Activation</Translate>
-          </h1>
-          {activationSuccess ? successAlert : undefined}
-          {activationFailure ? failureAlert : undefined}
-        </Col>
-      </Row>
-    </div>
-  );
-};
+  componentDidMount() {
+    const key = getUrlParameter('key', this.props.location.search);
+    this.props.activateAction(key);
+  }
 
-export default ActivatePage;
+  render() {
+    const { activationSuccess, activationFailure } = this.props;
+
+    return (
+      <div>
+        <Row className="justify-content-center">
+          <Col md="8">
+            <h1>
+              <Translate contentKey="activate.title">Activation</Translate>
+            </h1>
+            {activationSuccess ? successAlert : undefined}
+            {activationFailure ? failureAlert : undefined}
+          </Col>
+        </Row>
+      </div>
+    );
+  }
+}
+
+const mapStateToProps = ({ activate }: IRootState) => ({
+  activationSuccess: activate.activationSuccess,
+  activationFailure: activate.activationFailure
+});
+
+const mapDispatchToProps = { activateAction, reset };
+
+type StateProps = ReturnType<typeof mapStateToProps>;
+type DispatchProps = typeof mapDispatchToProps;
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ActivatePage);

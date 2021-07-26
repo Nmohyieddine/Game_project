@@ -1,67 +1,65 @@
-import React, { useEffect } from 'react';
-import { Translate, translate, ValidatedField, ValidatedForm, isEmail } from 'react-jhipster';
+import React from 'react';
+import { Translate, translate } from 'react-jhipster';
+import { connect } from 'react-redux';
+import { AvForm, AvField } from 'availity-reactstrap-validation';
 import { Button, Alert, Col, Row } from 'reactstrap';
-import { toast } from 'react-toastify';
 
+import { IRootState } from 'app/shared/reducers';
 import { handlePasswordResetInit, reset } from '../password-reset.reducer';
-import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export const PasswordResetInit = () => {
-  const dispatch = useAppDispatch();
+export type IPasswordResetInitProps = DispatchProps;
 
-  useEffect(
-    () => () => {
-      dispatch(reset());
-    },
-    []
-  );
+export class PasswordResetInit extends React.Component<IPasswordResetInitProps> {
+  componentWillUnmount() {
+    this.props.reset();
+  }
 
-  const handleValidSubmit = ({ email }) => {
-    dispatch(handlePasswordResetInit(email));
+  handleValidSubmit = (event, values) => {
+    this.props.handlePasswordResetInit(values.email);
+    event.preventDefault();
   };
 
-  const successMessage = useAppSelector(state => state.passwordReset.successMessage);
+  render() {
+    return (
+      <div>
+        <Row className="justify-content-center">
+          <Col md="8">
+            <h1>
+              <Translate contentKey="reset.request.title">Reset your password</Translate>
+            </h1>
+            <Alert color="warning">
+              <p>
+                <Translate contentKey="reset.request.messages.info">Enter the email address you used to register</Translate>
+              </p>
+            </Alert>
+            <AvForm onValidSubmit={this.handleValidSubmit}>
+              <AvField
+                name="email"
+                label={translate('global.form.email.label')}
+                placeholder={translate('global.form.email.placeholder')}
+                type="email"
+                validate={{
+                  required: { value: true, errorMessage: translate('global.messages.validate.email.required') },
+                  minLength: { value: 5, errorMessage: translate('global.messages.validate.email.minlength') },
+                  maxLength: { value: 254, errorMessage: translate('global.messages.validate.email.maxlength') }
+                }}
+              />
+              <Button color="primary" type="submit">
+                <Translate contentKey="reset.request.form.button">Reset password</Translate>
+              </Button>
+            </AvForm>
+          </Col>
+        </Row>
+      </div>
+    );
+  }
+}
 
-  useEffect(() => {
-    if (successMessage) {
-      toast.success(translate(successMessage));
-    }
-  }, [successMessage]);
+const mapDispatchToProps = { handlePasswordResetInit, reset };
 
-  return (
-    <div>
-      <Row className="justify-content-center">
-        <Col md="8">
-          <h1>
-            <Translate contentKey="reset.request.title">Reset your password</Translate>
-          </h1>
-          <Alert color="warning">
-            <p>
-              <Translate contentKey="reset.request.messages.info">Enter the email address you used to register</Translate>
-            </p>
-          </Alert>
-          <ValidatedForm onSubmit={handleValidSubmit}>
-            <ValidatedField
-              name="email"
-              label={translate('global.form.email.label')}
-              placeholder={translate('global.form.email.placeholder')}
-              type="email"
-              validate={{
-                required: { value: true, message: translate('global.messages.validate.email.required') },
-                minLength: { value: 5, message: translate('global.messages.validate.email.minlength') },
-                maxLength: { value: 254, message: translate('global.messages.validate.email.maxlength') },
-                validate: v => isEmail(v) || translate('global.messages.validate.email.invalid'),
-              }}
-              data-cy="emailResetPassword"
-            />
-            <Button color="primary" type="submit" data-cy="submit">
-              <Translate contentKey="reset.request.form.button">Reset password</Translate>
-            </Button>
-          </ValidatedForm>
-        </Col>
-      </Row>
-    </div>
-  );
-};
+type DispatchProps = typeof mapDispatchToProps;
 
-export default PasswordResetInit;
+export default connect(
+  null,
+  mapDispatchToProps
+)(PasswordResetInit);

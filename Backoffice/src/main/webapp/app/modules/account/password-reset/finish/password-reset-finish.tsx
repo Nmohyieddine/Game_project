@@ -1,86 +1,97 @@
-import React, { useState, useEffect } from 'react';
-import { Col, Row, Button } from 'reactstrap';
-import { Translate, translate, getUrlParameter, ValidatedField, ValidatedForm } from 'react-jhipster';
+import React from 'react';
+import { connect } from 'react-redux';
+import { Alert, Col, Row, Button } from 'reactstrap';
+import { AvForm, AvField } from 'availity-reactstrap-validation';
+import { Translate, translate, getUrlParameter } from 'react-jhipster';
 import { RouteComponentProps } from 'react-router-dom';
-import { toast } from 'react-toastify';
 
+import { IRootState } from 'app/shared/reducers';
 import { handlePasswordResetFinish, reset } from '../password-reset.reducer';
 import PasswordStrengthBar from 'app/shared/layout/password/password-strength-bar';
-import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export const PasswordResetFinishPage = (props: RouteComponentProps<{ key: string }>) => {
-  const [password, setPassword] = useState('');
-  const [key] = useState(getUrlParameter('key', props.location.search));
-  const dispatch = useAppDispatch();
+export interface IPasswordResetFinishProps extends DispatchProps, RouteComponentProps<{ key: string }> {}
 
-  useEffect(
-    () => () => {
-      dispatch(reset());
-    },
-    []
-  );
+export interface IPasswordResetFinishState {
+  password: string;
+  key: string;
+}
 
-  const handleValidSubmit = ({ newPassword }) => dispatch(handlePasswordResetFinish({ key, newPassword }));
+export class PasswordResetFinishPage extends React.Component<IPasswordResetFinishProps, IPasswordResetFinishState> {
+  state: IPasswordResetFinishState = {
+    password: '',
+    key: getUrlParameter('key', this.props.location.search)
+  };
 
-  const updatePassword = event => setPassword(event.target.value);
+  componentWillUnmount() {
+    this.props.reset();
+  }
 
-  const getResetForm = () => {
+  handleValidSubmit = (event, values) => {
+    this.props.handlePasswordResetFinish(this.state.key, values.newPassword);
+  };
+
+  updatePassword = event => {
+    this.setState({ password: event.target.value });
+  };
+
+  getResetForm() {
     return (
-      <ValidatedForm onSubmit={handleValidSubmit}>
-        <ValidatedField
+      <AvForm onValidSubmit={this.handleValidSubmit}>
+        <AvField
           name="newPassword"
           label={translate('global.form.newpassword.label')}
           placeholder={translate('global.form.newpassword.placeholder')}
           type="password"
           validate={{
-            required: { value: true, message: translate('global.messages.validate.newpassword.required') },
-            minLength: { value: 4, message: translate('global.messages.validate.newpassword.minlength') },
-            maxLength: { value: 50, message: translate('global.messages.validate.newpassword.maxlength') },
+            required: { value: true, errorMessage: translate('global.messages.validate.newpassword.required') },
+            minLength: { value: 4, errorMessage: translate('global.messages.validate.newpassword.minlength') },
+            maxLength: { value: 50, errorMessage: translate('global.messages.validate.newpassword.maxlength') }
           }}
-          onChange={updatePassword}
-          data-cy="resetPassword"
+          onChange={this.updatePassword}
         />
-        <PasswordStrengthBar password={password} />
-        <ValidatedField
+        <PasswordStrengthBar password={this.state.password} />
+        <AvField
           name="confirmPassword"
           label={translate('global.form.confirmpassword.label')}
           placeholder={translate('global.form.confirmpassword.placeholder')}
           type="password"
           validate={{
-            required: { value: true, message: translate('global.messages.validate.confirmpassword.required') },
-            minLength: { value: 4, message: translate('global.messages.validate.confirmpassword.minlength') },
-            maxLength: { value: 50, message: translate('global.messages.validate.confirmpassword.maxlength') },
-            validate: v => v === password || translate('global.messages.error.dontmatch'),
+            required: { value: true, errorMessage: translate('global.messages.validate.confirmpassword.required') },
+            minLength: { value: 4, errorMessage: translate('global.messages.validate.confirmpassword.minlength') },
+            maxLength: { value: 50, errorMessage: translate('global.messages.validate.confirmpassword.maxlength') },
+            match: { value: 'newPassword', errorMessage: translate('global.messages.error.dontmatch') }
           }}
-          data-cy="confirmResetPassword"
         />
-        <Button color="success" type="submit" data-cy="submit">
+        <Button color="success" type="submit">
           <Translate contentKey="reset.finish.form.button">Validate new password</Translate>
         </Button>
-      </ValidatedForm>
+      </AvForm>
     );
-  };
+  }
 
-  const successMessage = useAppSelector(state => state.passwordReset.successMessage);
+  render() {
+    const { key } = this.state;
 
-  useEffect(() => {
-    if (successMessage) {
-      toast.success(translate(successMessage));
-    }
-  }, [successMessage]);
+    return (
+      <div>
+        <Row className="justify-content-center">
+          <Col md="4">
+            <h1>
+              <Translate contentKey="reset.finish.title">Reset password</Translate>
+            </h1>
+            <div>{key ? this.getResetForm() : null}</div>
+          </Col>
+        </Row>
+      </div>
+    );
+  }
+}
 
-  return (
-    <div>
-      <Row className="justify-content-center">
-        <Col md="4">
-          <h1>
-            <Translate contentKey="reset.finish.title">Reset password</Translate>
-          </h1>
-          <div>{key ? getResetForm() : null}</div>
-        </Col>
-      </Row>
-    </div>
-  );
-};
+const mapDispatchToProps = { handlePasswordResetFinish, reset };
 
-export default PasswordResetFinishPage;
+type DispatchProps = typeof mapDispatchToProps;
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(PasswordResetFinishPage);

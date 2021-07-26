@@ -1,19 +1,24 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Route, Redirect, RouteProps } from 'react-router-dom';
 import { Translate } from 'react-jhipster';
-import { useAppSelector } from 'app/config/store';
+import { IRootState } from 'app/shared/reducers';
 import ErrorBoundary from 'app/shared/error/error-boundary';
 
 interface IOwnProps extends RouteProps {
   hasAnyAuthorities?: string[];
 }
 
-export const PrivateRouteComponent = ({ component: Component, hasAnyAuthorities = [], ...rest }: IOwnProps) => {
-  const isAuthenticated = useAppSelector(state => state.authentication.isAuthenticated);
-  const sessionHasBeenFetched = useAppSelector(state => state.authentication.sessionHasBeenFetched);
-  const account = useAppSelector(state => state.authentication.account);
-  const isAuthorized = hasAnyAuthority(account.authorities, hasAnyAuthorities);
+export interface IPrivateRouteProps extends IOwnProps, StateProps {}
 
+export const PrivateRouteComponent = ({
+  component: Component,
+  isAuthenticated,
+  sessionHasBeenFetched,
+  isAuthorized,
+  hasAnyAuthorities = [],
+  ...rest
+}: IPrivateRouteProps) => {
   const checkAuthorities = props =>
     isAuthorized ? (
       <ErrorBoundary>
@@ -29,7 +34,7 @@ export const PrivateRouteComponent = ({ component: Component, hasAnyAuthorities 
 
   const renderRedirect = props => {
     if (!sessionHasBeenFetched) {
-      return <div></div>;
+      return <div />;
     } else {
       return isAuthenticated ? (
         checkAuthorities(props)
@@ -38,7 +43,7 @@ export const PrivateRouteComponent = ({ component: Component, hasAnyAuthorities 
           to={{
             pathname: '/login',
             search: props.location.search,
-            state: { from: props.location },
+            state: { from: props.location }
           }}
         />
       );
@@ -60,9 +65,27 @@ export const hasAnyAuthority = (authorities: string[], hasAnyAuthorities: string
   return false;
 };
 
+const mapStateToProps = (
+  { authentication: { isAuthenticated, account, sessionHasBeenFetched } }: IRootState,
+  { hasAnyAuthorities = [] }: IOwnProps
+) => ({
+  isAuthenticated,
+  isAuthorized: hasAnyAuthority(account.authorities, hasAnyAuthorities),
+  sessionHasBeenFetched
+});
+
+type StateProps = ReturnType<typeof mapStateToProps>;
+
 /**
  * A route wrapped in an authentication check so that routing happens only when you are authenticated.
  * Accepts same props as React router Route.
  * The route also checks for authorization if hasAnyAuthorities is specified.
  */
-export default PrivateRouteComponent;
+export const PrivateRoute = connect<StateProps, undefined, IOwnProps>(
+  mapStateToProps,
+  null,
+  null,
+  { pure: false }
+)(PrivateRouteComponent);
+
+export default PrivateRoute;

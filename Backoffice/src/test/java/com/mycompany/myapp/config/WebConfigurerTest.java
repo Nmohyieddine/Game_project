@@ -1,7 +1,23 @@
 package com.mycompany.myapp.config;
 
+import io.github.jhipster.config.JHipsterConstants;
+import io.github.jhipster.config.JHipsterProperties;
+import io.github.jhipster.web.filter.CachingHttpHeadersFilter;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.mock.env.MockEnvironment;
+import org.springframework.mock.web.MockServletContext;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import javax.servlet.*;
+import java.io.File;
+import java.util.*;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -10,24 +26,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.File;
-import java.util.*;
-import javax.servlet.*;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.mock.env.MockEnvironment;
-import org.springframework.mock.web.MockServletContext;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import tech.jhipster.config.JHipsterConstants;
-import tech.jhipster.config.JHipsterProperties;
-
 /**
  * Unit tests for the {@link WebConfigurer} class.
  */
-class WebConfigurerTest {
+public class WebConfigurerTest {
 
     private WebConfigurer webConfigurer;
 
@@ -40,8 +42,10 @@ class WebConfigurerTest {
     @BeforeEach
     public void setup() {
         servletContext = spy(new MockServletContext());
-        doReturn(mock(FilterRegistration.Dynamic.class)).when(servletContext).addFilter(anyString(), any(Filter.class));
-        doReturn(mock(ServletRegistration.Dynamic.class)).when(servletContext).addServlet(anyString(), any(Servlet.class));
+        doReturn(mock(FilterRegistration.Dynamic.class))
+            .when(servletContext).addFilter(anyString(), any(Filter.class));
+        doReturn(mock(ServletRegistration.Dynamic.class))
+            .when(servletContext).addServlet(anyString(), any(Servlet.class));
 
         env = new MockEnvironment();
         props = new JHipsterProperties();
@@ -50,48 +54,50 @@ class WebConfigurerTest {
     }
 
     @Test
-    void shouldStartUpProdServletContext() throws ServletException {
+    public void testStartUpProdServletContext() throws ServletException {
         env.setActiveProfiles(JHipsterConstants.SPRING_PROFILE_PRODUCTION);
+        webConfigurer.onStartup(servletContext);
 
-        assertThatCode(() -> webConfigurer.onStartup(servletContext)).doesNotThrowAnyException();
+        verify(servletContext).addFilter(eq("cachingHttpHeadersFilter"), any(CachingHttpHeadersFilter.class));
     }
 
     @Test
-    void shouldStartUpDevServletContext() throws ServletException {
+    public void testStartUpDevServletContext() throws ServletException {
         env.setActiveProfiles(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT);
+        webConfigurer.onStartup(servletContext);
 
-        assertThatCode(() -> webConfigurer.onStartup(servletContext)).doesNotThrowAnyException();
+        verify(servletContext, never()).addFilter(eq("cachingHttpHeadersFilter"), any(CachingHttpHeadersFilter.class));
     }
 
     @Test
-    void shouldCustomizeServletContainer() {
+    public void testCustomizeServletContainer() {
         env.setActiveProfiles(JHipsterConstants.SPRING_PROFILE_PRODUCTION);
         UndertowServletWebServerFactory container = new UndertowServletWebServerFactory();
         webConfigurer.customize(container);
         assertThat(container.getMimeMappings().get("abs")).isEqualTo("audio/x-mpeg");
-        assertThat(container.getMimeMappings().get("html")).isEqualTo("text/html");
-        assertThat(container.getMimeMappings().get("json")).isEqualTo("application/json");
+        assertThat(container.getMimeMappings().get("html")).isEqualTo("text/html;charset=utf-8");
+        assertThat(container.getMimeMappings().get("json")).isEqualTo("text/html;charset=utf-8");
         if (container.getDocumentRoot() != null) {
             assertThat(container.getDocumentRoot()).isEqualTo(new File("target/classes/static/"));
         }
     }
 
     @Test
-    void shouldCorsFilterOnApiPath() throws Exception {
-        props.getCors().setAllowedOrigins(Collections.singletonList("other.domain.com"));
+    public void testCorsFilterOnApiPath() throws Exception {
+        props.getCors().setAllowedOrigins(Collections.singletonList("*"));
         props.getCors().setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         props.getCors().setAllowedHeaders(Collections.singletonList("*"));
         props.getCors().setMaxAge(1800L);
         props.getCors().setAllowCredentials(true);
 
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new WebConfigurerTestController()).addFilters(webConfigurer.corsFilter()).build();
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new WebConfigurerTestController())
+            .addFilters(webConfigurer.corsFilter())
+            .build();
 
-        mockMvc
-            .perform(
-                options("/api/test-cors")
-                    .header(HttpHeaders.ORIGIN, "other.domain.com")
-                    .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "POST")
-            )
+        mockMvc.perform(
+            options("/api/test-cors")
+                .header(HttpHeaders.ORIGIN, "other.domain.com")
+                .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "POST"))
             .andExpect(status().isOk())
             .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "other.domain.com"))
             .andExpect(header().string(HttpHeaders.VARY, "Origin"))
@@ -99,48 +105,58 @@ class WebConfigurerTest {
             .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true"))
             .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_MAX_AGE, "1800"));
 
-        mockMvc
-            .perform(get("/api/test-cors").header(HttpHeaders.ORIGIN, "other.domain.com"))
+        mockMvc.perform(
+            get("/api/test-cors")
+                .header(HttpHeaders.ORIGIN, "other.domain.com"))
             .andExpect(status().isOk())
             .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "other.domain.com"));
     }
 
     @Test
-    void shouldCorsFilterOnOtherPath() throws Exception {
+    public void testCorsFilterOnOtherPath() throws Exception {
         props.getCors().setAllowedOrigins(Collections.singletonList("*"));
         props.getCors().setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         props.getCors().setAllowedHeaders(Collections.singletonList("*"));
         props.getCors().setMaxAge(1800L);
         props.getCors().setAllowCredentials(true);
 
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new WebConfigurerTestController()).addFilters(webConfigurer.corsFilter()).build();
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new WebConfigurerTestController())
+            .addFilters(webConfigurer.corsFilter())
+            .build();
 
-        mockMvc
-            .perform(get("/test/test-cors").header(HttpHeaders.ORIGIN, "other.domain.com"))
+        mockMvc.perform(
+            get("/test/test-cors")
+                .header(HttpHeaders.ORIGIN, "other.domain.com"))
             .andExpect(status().isOk())
             .andExpect(header().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN));
     }
 
     @Test
-    void shouldCorsFilterDeactivatedForNullAllowedOrigins() throws Exception {
+    public void testCorsFilterDeactivated() throws Exception {
         props.getCors().setAllowedOrigins(null);
 
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new WebConfigurerTestController()).addFilters(webConfigurer.corsFilter()).build();
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new WebConfigurerTestController())
+            .addFilters(webConfigurer.corsFilter())
+            .build();
 
-        mockMvc
-            .perform(get("/api/test-cors").header(HttpHeaders.ORIGIN, "other.domain.com"))
+        mockMvc.perform(
+            get("/api/test-cors")
+                .header(HttpHeaders.ORIGIN, "other.domain.com"))
             .andExpect(status().isOk())
             .andExpect(header().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN));
     }
 
     @Test
-    void shouldCorsFilterDeactivatedForEmptyAllowedOrigins() throws Exception {
+    public void testCorsFilterDeactivated2() throws Exception {
         props.getCors().setAllowedOrigins(new ArrayList<>());
 
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new WebConfigurerTestController()).addFilters(webConfigurer.corsFilter()).build();
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new WebConfigurerTestController())
+            .addFilters(webConfigurer.corsFilter())
+            .build();
 
-        mockMvc
-            .perform(get("/api/test-cors").header(HttpHeaders.ORIGIN, "other.domain.com"))
+        mockMvc.perform(
+            get("/api/test-cors")
+                .header(HttpHeaders.ORIGIN, "other.domain.com"))
             .andExpect(status().isOk())
             .andExpect(header().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN));
     }

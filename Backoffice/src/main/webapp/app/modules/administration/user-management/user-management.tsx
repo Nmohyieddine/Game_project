@@ -1,230 +1,213 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Table, Row, Badge } from 'reactstrap';
-import { Translate, TextFormat, JhiPagination, JhiItemCount, getSortState } from 'react-jhipster';
+import {
+  Translate,
+  ICrudGetAllAction,
+  ICrudPutAction,
+  TextFormat,
+  JhiPagination,
+  JhiItemCount,
+  getSortState,
+  IPaginationBaseState
+} from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { APP_DATE_FORMAT } from 'app/config/constants';
-import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
-import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
-import { getUsersAsAdmin, updateUser } from './user-management.reducer';
-import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { ITEMS_PER_PAGE } from 'app/shared/util/pagination.constants';
+import { getUsers, updateUser } from './user-management.reducer';
+import { IRootState } from 'app/shared/reducers';
 
-export const UserManagement = (props: RouteComponentProps<any>) => {
-  const dispatch = useAppDispatch();
+export interface IUserManagementProps extends StateProps, DispatchProps, RouteComponentProps<{}> {}
 
-  const [pagination, setPagination] = useState(
-    overridePaginationStateWithQueryParams(getSortState(props.location, ITEMS_PER_PAGE, 'id'), props.location.search)
-  );
-
-  const getUsersFromProps = () => {
-    dispatch(
-      getUsersAsAdmin({
-        page: pagination.activePage - 1,
-        size: pagination.itemsPerPage,
-        sort: `${pagination.sort},${pagination.order}`,
-      })
-    );
-    const endURL = `?page=${pagination.activePage}&sort=${pagination.sort},${pagination.order}`;
-    if (props.location.search !== endURL) {
-      props.history.push(`${props.location.pathname}${endURL}`);
-    }
+export class UserManagement extends React.Component<IUserManagementProps, IPaginationBaseState> {
+  state: IPaginationBaseState = {
+    ...getSortState(this.props.location, ITEMS_PER_PAGE)
   };
 
-  useEffect(() => {
-    getUsersFromProps();
-  }, [pagination.activePage, pagination.order, pagination.sort]);
+  componentDidMount() {
+    this.getUsers();
+  }
 
-  useEffect(() => {
-    const params = new URLSearchParams(props.location.search);
-    const page = params.get('page');
-    const sortParam = params.get(SORT);
-    if (page && sortParam) {
-      const sortSplit = sortParam.split(',');
-      setPagination({
-        ...pagination,
-        activePage: +page,
-        sort: sortSplit[0],
-        order: sortSplit[1],
-      });
-    }
-  }, [props.location.search]);
-
-  const sort = p => () =>
-    setPagination({
-      ...pagination,
-      order: pagination.order === ASC ? DESC : ASC,
-      sort: p,
-    });
-
-  const handlePagination = currentPage =>
-    setPagination({
-      ...pagination,
-      activePage: currentPage,
-    });
-
-  const handleSyncList = () => {
-    getUsersFromProps();
+  sort = prop => () => {
+    this.setState(
+      {
+        order: this.state.order === 'asc' ? 'desc' : 'asc',
+        sort: prop
+      },
+      () => this.sortUsers()
+    );
   };
 
-  const toggleActive = user => () =>
-    dispatch(
-      updateUser({
-        ...user,
-        activated: !user.activated,
-      })
-    );
+  sortUsers() {
+    this.getUsers();
+    this.props.history.push(`${this.props.location.pathname}?page=${this.state.activePage}&sort=${this.state.sort},${this.state.order}`);
+  }
 
-  const { match } = props;
-  const account = useAppSelector(state => state.authentication.account);
-  const users = useAppSelector(state => state.userManagement.users);
-  const totalItems = useAppSelector(state => state.userManagement.totalItems);
-  const loading = useAppSelector(state => state.userManagement.loading);
+  handlePagination = activePage => this.setState({ activePage }, () => this.sortUsers());
 
-  return (
-    <div>
-      <h2 id="user-management-page-heading" data-cy="userManagementPageHeading">
-        <Translate contentKey="userManagement.home.title">Users</Translate>
-        <div className="d-flex justify-content-end">
-          <Button className="mr-2" color="info" onClick={handleSyncList} disabled={loading}>
-            <FontAwesomeIcon icon="sync" spin={loading} />{' '}
-            <Translate contentKey="userManagement.home.refreshListLabel">Refresh List</Translate>
-          </Button>
-          <Link to={`${match.url}/new`} className="btn btn-primary jh-create-entity">
+  getUsers = () => {
+    const { activePage, itemsPerPage, sort, order } = this.state;
+    this.props.getUsers(activePage - 1, itemsPerPage, `${sort},${order}`);
+  };
+
+  toggleActive = user => () => {
+    this.props.updateUser({
+      ...user,
+      activated: !user.activated
+    });
+  };
+
+  render() {
+    const { users, account, match, totalItems } = this.props;
+    return (
+      <div>
+        <h2 id="user-management-page-heading">
+          <Translate contentKey="userManagement.home.title">Users</Translate>
+          <Link to={`${match.url}/new`} className="btn btn-primary float-right jh-create-entity">
             <FontAwesomeIcon icon="plus" /> <Translate contentKey="userManagement.home.createLabel">Create a new user</Translate>
           </Link>
-        </div>
-      </h2>
-      <Table responsive striped>
-        <thead>
-          <tr>
-            <th className="hand" onClick={sort('id')}>
-              <Translate contentKey="global.field.id">ID</Translate>
-              <FontAwesomeIcon icon="sort" />
-            </th>
-            <th className="hand" onClick={sort('login')}>
-              <Translate contentKey="userManagement.login">Login</Translate>
-              <FontAwesomeIcon icon="sort" />
-            </th>
-            <th className="hand" onClick={sort('email')}>
-              <Translate contentKey="userManagement.email">Email</Translate>
-              <FontAwesomeIcon icon="sort" />
-            </th>
-            <th />
-            <th className="hand" onClick={sort('langKey')}>
-              <Translate contentKey="userManagement.langKey">Lang Key</Translate>
-              <FontAwesomeIcon icon="sort" />
-            </th>
-            <th>
-              <Translate contentKey="userManagement.profiles">Profiles</Translate>
-            </th>
-            <th className="hand" onClick={sort('createdDate')}>
-              <Translate contentKey="userManagement.createdDate">Created Date</Translate>
-              <FontAwesomeIcon icon="sort" />
-            </th>
-            <th className="hand" onClick={sort('lastModifiedBy')}>
-              <Translate contentKey="userManagement.lastModifiedBy">Last Modified By</Translate>
-              <FontAwesomeIcon icon="sort" />
-            </th>
-            <th id="modified-date-sort" className="hand" onClick={sort('lastModifiedDate')}>
-              <Translate contentKey="userManagement.lastModifiedDate">Last Modified Date</Translate>
-              <FontAwesomeIcon icon="sort" />
-            </th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user, i) => (
-            <tr id={user.login} key={`user-${i}`}>
-              <td>
-                <Button tag={Link} to={`${match.url}/${user.login}`} color="link" size="sm">
-                  {user.id}
-                </Button>
-              </td>
-              <td>{user.login}</td>
-              <td>{user.email}</td>
-              <td>
-                {user.activated ? (
-                  <Button color="success" onClick={toggleActive(user)}>
-                    <Translate contentKey="userManagement.activated">Activated</Translate>
-                  </Button>
-                ) : (
-                  <Button color="danger" onClick={toggleActive(user)}>
-                    <Translate contentKey="userManagement.deactivated">Deactivated</Translate>
-                  </Button>
-                )}
-              </td>
-              <td>{user.langKey}</td>
-              <td>
-                {user.authorities
-                  ? user.authorities.map((authority, j) => (
-                      <div key={`user-auth-${i}-${j}`}>
-                        <Badge color="info">{authority}</Badge>
-                      </div>
-                    ))
-                  : null}
-              </td>
-              <td>
-                {user.createdDate ? <TextFormat value={user.createdDate} type="date" format={APP_DATE_FORMAT} blankOnInvalid /> : null}
-              </td>
-              <td>{user.lastModifiedBy}</td>
-              <td>
-                {user.lastModifiedDate ? (
-                  <TextFormat value={user.lastModifiedDate} type="date" format={APP_DATE_FORMAT} blankOnInvalid />
-                ) : null}
-              </td>
-              <td className="text-right">
-                <div className="btn-group flex-btn-group-container">
-                  <Button tag={Link} to={`${match.url}/${user.login}`} color="info" size="sm">
-                    <FontAwesomeIcon icon="eye" />{' '}
-                    <span className="d-none d-md-inline">
-                      <Translate contentKey="entity.action.view">View</Translate>
-                    </span>
-                  </Button>
-                  <Button tag={Link} to={`${match.url}/${user.login}/edit`} color="primary" size="sm">
-                    <FontAwesomeIcon icon="pencil-alt" />{' '}
-                    <span className="d-none d-md-inline">
-                      <Translate contentKey="entity.action.edit">Edit</Translate>
-                    </span>
-                  </Button>
-                  <Button
-                    tag={Link}
-                    to={`${match.url}/${user.login}/delete`}
-                    color="danger"
-                    size="sm"
-                    disabled={account.login === user.login}
-                  >
-                    <FontAwesomeIcon icon="trash" />{' '}
-                    <span className="d-none d-md-inline">
-                      <Translate contentKey="entity.action.delete">Delete</Translate>
-                    </span>
-                  </Button>
-                </div>
-              </td>
+        </h2>
+        <Table responsive striped>
+          <thead>
+            <tr>
+              <th className="hand" onClick={this.sort('id')}>
+                <Translate contentKey="global.field.id">ID</Translate>
+                <FontAwesomeIcon icon="sort" />
+              </th>
+              <th className="hand" onClick={this.sort('login')}>
+                <Translate contentKey="userManagement.login">Login</Translate>
+                <FontAwesomeIcon icon="sort" />
+              </th>
+              <th className="hand" onClick={this.sort('email')}>
+                <Translate contentKey="userManagement.email">Email</Translate>
+                <FontAwesomeIcon icon="sort" />
+              </th>
+              <th />
+              <th className="hand" onClick={this.sort('langKey')}>
+                <Translate contentKey="userManagement.langKey">Lang Key</Translate>
+                <FontAwesomeIcon icon="sort" />
+              </th>
+              <th>
+                <Translate contentKey="userManagement.profiles">Profiles</Translate>
+              </th>
+              <th className="hand" onClick={this.sort('createdDate')}>
+                <Translate contentKey="userManagement.createdDate">Created Date</Translate>
+                <FontAwesomeIcon icon="sort" />
+              </th>
+              <th className="hand" onClick={this.sort('lastModifiedBy')}>
+                <Translate contentKey="userManagement.lastModifiedBy">Last Modified By</Translate>
+                <FontAwesomeIcon icon="sort" />
+              </th>
+              <th id="modified-date-sort" className="hand" onClick={this.sort('lastModifiedDate')}>
+                <Translate contentKey="userManagement.lastModifiedDate">Last Modified Date</Translate>
+                <FontAwesomeIcon icon="sort" />
+              </th>
+              <th />
             </tr>
-          ))}
-        </tbody>
-      </Table>
-      {totalItems ? (
+          </thead>
+          <tbody>
+            {users.map((user, i) => (
+              <tr id={user.login} key={`user-${i}`}>
+                <td>
+                  <Button tag={Link} to={`${match.url}/${user.login}`} color="link" size="sm">
+                    {user.id}
+                  </Button>
+                </td>
+                <td>{user.login}</td>
+                <td>{user.email}</td>
+                <td>
+                  {user.activated ? (
+                    <Button color="success" onClick={this.toggleActive(user)}>
+                      Activated
+                    </Button>
+                  ) : (
+                    <Button color="danger" onClick={this.toggleActive(user)}>
+                      Deactivated
+                    </Button>
+                  )}
+                </td>
+                <td>{user.langKey}</td>
+                <td>
+                  {user.authorities
+                    ? user.authorities.map((authority, j) => (
+                        <div key={`user-auth-${i}-${j}`}>
+                          <Badge color="info">{authority}</Badge>
+                        </div>
+                      ))
+                    : null}
+                </td>
+                <td>
+                  <TextFormat value={user.createdDate} type="date" format={APP_DATE_FORMAT} blankOnInvalid />
+                </td>
+                <td>{user.lastModifiedBy}</td>
+                <td>
+                  <TextFormat value={user.lastModifiedDate} type="date" format={APP_DATE_FORMAT} blankOnInvalid />
+                </td>
+                <td className="text-right">
+                  <div className="btn-group flex-btn-group-container">
+                    <Button tag={Link} to={`${match.url}/${user.login}`} color="info" size="sm">
+                      <FontAwesomeIcon icon="eye" />{' '}
+                      <span className="d-none d-md-inline">
+                        <Translate contentKey="entity.action.view">View</Translate>
+                      </span>
+                    </Button>
+                    <Button tag={Link} to={`${match.url}/${user.login}/edit`} color="primary" size="sm">
+                      <FontAwesomeIcon icon="pencil-alt" />{' '}
+                      <span className="d-none d-md-inline">
+                        <Translate contentKey="entity.action.edit">Edit</Translate>
+                      </span>
+                    </Button>
+                    <Button
+                      tag={Link}
+                      to={`${match.url}/${user.login}/delete`}
+                      color="danger"
+                      size="sm"
+                      disabled={account.login === user.login}
+                    >
+                      <FontAwesomeIcon icon="trash" />{' '}
+                      <span className="d-none d-md-inline">
+                        <Translate contentKey="entity.action.delete">Delete</Translate>
+                      </span>
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
         <div className={users && users.length > 0 ? '' : 'd-none'}>
           <Row className="justify-content-center">
-            <JhiItemCount page={pagination.activePage} total={totalItems} itemsPerPage={pagination.itemsPerPage} i18nEnabled />
+            <JhiItemCount page={this.state.activePage} total={totalItems} itemsPerPage={this.state.itemsPerPage} i18nEnabled />
           </Row>
           <Row className="justify-content-center">
             <JhiPagination
-              activePage={pagination.activePage}
-              onSelect={handlePagination}
+              activePage={this.state.activePage}
+              onSelect={this.handlePagination}
               maxButtons={5}
-              itemsPerPage={pagination.itemsPerPage}
-              totalItems={totalItems}
+              itemsPerPage={this.state.itemsPerPage}
+              totalItems={this.props.totalItems}
             />
           </Row>
         </div>
-      ) : (
-        ''
-      )}
-    </div>
-  );
-};
+      </div>
+    );
+  }
+}
 
-export default UserManagement;
+const mapStateToProps = (storeState: IRootState) => ({
+  users: storeState.userManagement.users,
+  totalItems: storeState.userManagement.totalItems,
+  account: storeState.authentication.account
+});
+
+const mapDispatchToProps = { getUsers, updateUser };
+
+type StateProps = ReturnType<typeof mapStateToProps>;
+type DispatchProps = typeof mapDispatchToProps;
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(UserManagement);

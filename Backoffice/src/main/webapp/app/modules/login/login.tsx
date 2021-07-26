@@ -1,34 +1,61 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { connect } from 'react-redux';
 import { Redirect, RouteComponentProps } from 'react-router-dom';
 
-import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { IRootState } from 'app/shared/reducers';
 import { login } from 'app/shared/reducers/authentication';
 import LoginModal from './login-modal';
 
-export const Login = (props: RouteComponentProps<any>) => {
-  const dispatch = useAppDispatch();
-  const isAuthenticated = useAppSelector(state => state.authentication.isAuthenticated);
-  const loginError = useAppSelector(state => state.authentication.loginError);
-  const showModalLogin = useAppSelector(state => state.authentication.showModalLogin);
-  const [showModal, setShowModal] = useState(showModalLogin);
+export interface ILoginProps extends StateProps, DispatchProps, RouteComponentProps<{}> {}
 
-  useEffect(() => {
-    setShowModal(true);
-  }, []);
+export interface ILoginState {
+  showModal: boolean;
+}
 
-  const handleLogin = (username, password, rememberMe = false) => dispatch(login(username, password, rememberMe));
-
-  const handleClose = () => {
-    setShowModal(false);
-    props.history.push('/');
+export class Login extends React.Component<ILoginProps, ILoginState> {
+  state: ILoginState = {
+    showModal: this.props.showModal
   };
 
-  const { location } = props;
-  const { from } = (location.state as any) || { from: { pathname: '/', search: location.search } };
-  if (isAuthenticated) {
-    return <Redirect to={from} />;
+  componentDidUpdate(prevProps: ILoginProps, prevState) {
+    if (this.props !== prevProps) {
+      this.setState({ showModal: this.props.showModal });
+    }
   }
-  return <LoginModal showModal={showModal} handleLogin={handleLogin} handleClose={handleClose} loginError={loginError} />;
-};
 
-export default Login;
+  handleLogin = (username, password, rememberMe = false) => {
+    this.props.login(username, password, rememberMe);
+  };
+
+  handleClose = () => {
+    this.setState({ showModal: false });
+  };
+
+  render() {
+    const { location, isAuthenticated } = this.props;
+    const { from } = location.state || { from: { pathname: '/', search: location.search } };
+    const { showModal } = this.state;
+    if (isAuthenticated) {
+      return <Redirect to={from} />;
+    }
+    return (
+      <LoginModal showModal={showModal} handleLogin={this.handleLogin} handleClose={this.handleClose} loginError={this.props.loginError} />
+    );
+  }
+}
+
+const mapStateToProps = ({ authentication }: IRootState) => ({
+  isAuthenticated: authentication.isAuthenticated,
+  loginError: authentication.loginError,
+  showModal: authentication.showModalLogin
+});
+
+const mapDispatchToProps = { login };
+
+type StateProps = ReturnType<typeof mapStateToProps>;
+type DispatchProps = typeof mapDispatchToProps;
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Login);
