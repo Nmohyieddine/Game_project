@@ -1,0 +1,59 @@
+
+entity Questions {
+	idquestion Integer required
+	question String
+}
+
+
+entity Reponses {
+	idreponse Integer required
+}
+
+
+// an ignored comment
+/** not an ignored comment */
+
+
+entity Propositions {
+	idpropositions Integer required,
+	proposition String
+}
+
+
+
+
+
+
+
+
+relationship OneToMany {
+	Questions to Propositions{idquestion}
+}
+
+
+relationship OneToMany {
+	Questions to Reponses{idreponse}
+}
+
+
+
+
+
+
+
+
+
+// Set pagination options
+
+paginate Questions with pagination
+
+//paginate Job with pagination
+
+// Use Data Transfer Objects (DTO)
+dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl 
+
+// Set an angular suffix
+// angularSuffix * with mySuffix

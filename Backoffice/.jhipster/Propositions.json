@@ -1,0 +1,35 @@
+{
+    "name": "Propositions",
+    "fields": [
+        {
+            "fieldName": "idpropositions",
+            "fieldType": "Integer",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "proposition",
+            "fieldType": "String"
+        }
+    ],
+    "relationships": [
+        {
+            "relationshipType": "many-to-one",
+            "otherEntityName": "questions",
+            "otherEntityRelationshipName": "propositions",
+            "relationshipName": "idquestion",
+            "otherEntityField": "id"
+        }
+    ],
+    "changelogDate": "20210726155545",
+    "javadoc": "not an ignored comment",
+    "entityTableName": "propositions",
+    "dto": "mapstruct",
+    "pagination": "no",
+    "service": "serviceImpl",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "applications": "*"
+}

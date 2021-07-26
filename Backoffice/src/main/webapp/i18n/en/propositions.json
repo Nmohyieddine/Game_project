@@ -1,0 +1,24 @@
+{
+  "backofficeApp": {
+    "propositions": {
+      "home": {
+        "title": "Propositions",
+        "createLabel": "Create a new Propositions",
+        "createOrEditLabel": "Create or edit a Propositions",
+        "notFound": "No Propositions found"
+      },
+      "created": "A new Propositions is created with identifier {{ param }}",
+      "updated": "A Propositions is updated with identifier {{ param }}",
+      "deleted": "A Propositions is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Propositions {{ id }}?"
+      },
+      "detail": {
+        "title": "Propositions"
+      },
+      "idpropositions": "Idpropositions",
+      "proposition": "Proposition",
+      "idquestion": "Idquestion"
+    }
+  }
+}

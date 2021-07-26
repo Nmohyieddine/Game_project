@@ -1,0 +1,30 @@
+{
+    "name": "Reponses",
+    "fields": [
+        {
+            "fieldName": "idreponse",
+            "fieldType": "Integer",
+            "fieldValidateRules": [
+                "required"
+            ]
+        }
+    ],
+    "relationships": [
+        {
+            "relationshipType": "many-to-one",
+            "otherEntityName": "questions",
+            "otherEntityRelationshipName": "reponses",
+            "relationshipName": "idreponse",
+            "otherEntityField": "id"
+        }
+    ],
+    "changelogDate": "20210726161147",
+    "entityTableName": "reponses",
+    "dto": "mapstruct",
+    "pagination": "no",
+    "service": "serviceImpl",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "applications": "*"
+}
