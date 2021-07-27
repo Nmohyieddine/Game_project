@@ -12,8 +12,6 @@ import org.mapstruct.*;
 public interface QuestionsMapper extends EntityMapper<QuestionsDTO, Questions> {
 
 
-    @Mapping(target = "propositions", ignore = true)
-    @Mapping(target = "removePropositions", ignore = true)
     @Mapping(target = "reponses", ignore = true)
     @Mapping(target = "removeReponses", ignore = true)
     Questions toEntity(QuestionsDTO questionsDTO);

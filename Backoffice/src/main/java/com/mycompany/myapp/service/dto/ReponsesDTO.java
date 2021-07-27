@@ -13,8 +13,12 @@ public class ReponsesDTO implements Serializable {
     @NotNull
     private Integer idreponse;
 
+    private String reponse;
 
-    private Long idreponseId;
+
+    private Long questionsId;
+
+    private String questionsIdquestion;
 
     public Long getId() {
         return id;
@@ -32,12 +36,28 @@ public class ReponsesDTO implements Serializable {
         this.idreponse = idreponse;
     }
 
-    public Long getIdreponseId() {
-        return idreponseId;
+    public String getReponse() {
+        return reponse;
     }
 
-    public void setIdreponseId(Long questionsId) {
-        this.idreponseId = questionsId;
+    public void setReponse(String reponse) {
+        this.reponse = reponse;
+    }
+
+    public Long getQuestionsId() {
+        return questionsId;
+    }
+
+    public void setQuestionsId(Long questionsId) {
+        this.questionsId = questionsId;
+    }
+
+    public String getQuestionsIdquestion() {
+        return questionsIdquestion;
+    }
+
+    public void setQuestionsIdquestion(String questionsIdquestion) {
+        this.questionsIdquestion = questionsIdquestion;
     }
 
     @Override
@@ -66,7 +86,9 @@ public class ReponsesDTO implements Serializable {
         return "ReponsesDTO{" +
             "id=" + getId() +
             ", idreponse=" + getIdreponse() +
-            ", idreponse=" + getIdreponseId() +
+            ", reponse='" + getReponse() + "'" +
+            ", questions=" + getQuestionsId() +
+            ", questions='" + getQuestionsIdquestion() + "'" +
             "}";
     }
 }

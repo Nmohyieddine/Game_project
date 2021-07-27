@@ -11,10 +11,11 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = {QuestionsMapper.class})
 public interface ReponsesMapper extends EntityMapper<ReponsesDTO, Reponses> {
 
-    @Mapping(source = "idreponse.id", target = "idreponseId")
+    @Mapping(source = "questions.id", target = "questionsId")
+    @Mapping(source = "questions.idquestion", target = "questionsIdquestion")
     ReponsesDTO toDto(Reponses reponses);
 
-    @Mapping(source = "idreponseId", target = "idreponse")
+    @Mapping(source = "questionsId", target = "questions")
     Reponses toEntity(ReponsesDTO reponsesDTO);
 
     default Reponses fromId(Long id) {

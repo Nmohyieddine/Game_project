@@ -26,9 +26,12 @@ public class Reponses implements Serializable {
     @Column(name = "idreponse", nullable = false)
     private Integer idreponse;
 
+    @Column(name = "reponse")
+    private String reponse;
+
     @ManyToOne
     @JsonIgnoreProperties("reponses")
-    private Questions idreponse;
+    private Questions questions;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -52,17 +55,30 @@ public class Reponses implements Serializable {
         this.idreponse = idreponse;
     }
 
-    public Questions getIdreponse() {
-        return idreponse;
+    public String getReponse() {
+        return reponse;
     }
 
-    public Reponses idreponse(Questions questions) {
-        this.idreponse = questions;
+    public Reponses reponse(String reponse) {
+        this.reponse = reponse;
         return this;
     }
 
-    public void setIdreponse(Questions questions) {
-        this.idreponse = questions;
+    public void setReponse(String reponse) {
+        this.reponse = reponse;
+    }
+
+    public Questions getQuestions() {
+        return questions;
+    }
+
+    public Reponses questions(Questions questions) {
+        this.questions = questions;
+        return this;
+    }
+
+    public void setQuestions(Questions questions) {
+        this.questions = questions;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
@@ -87,6 +103,7 @@ public class Reponses implements Serializable {
         return "Reponses{" +
             "id=" + getId() +
             ", idreponse=" + getIdreponse() +
+            ", reponse='" + getReponse() + "'" +
             "}";
     }
 }

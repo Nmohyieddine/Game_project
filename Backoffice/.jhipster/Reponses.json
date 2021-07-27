@@ -7,6 +7,10 @@
             "fieldValidateRules": [
                 "required"
             ]
+        },
+        {
+            "fieldName": "reponse",
+            "fieldType": "String"
         }
     ],
     "relationships": [
@@ -14,14 +18,14 @@
             "relationshipType": "many-to-one",
             "otherEntityName": "questions",
             "otherEntityRelationshipName": "reponses",
-            "relationshipName": "idreponse",
-            "otherEntityField": "id"
+            "relationshipName": "questions",
+            "otherEntityField": "idquestion"
         }
     ],
-    "changelogDate": "20210726161147",
+    "changelogDate": "20210727084908",
     "entityTableName": "reponses",
     "dto": "mapstruct",
-    "pagination": "no",
+    "pagination": "pagination",
     "service": "serviceImpl",
     "jpaMetamodelFiltering": false,
     "fluentMethods": true,

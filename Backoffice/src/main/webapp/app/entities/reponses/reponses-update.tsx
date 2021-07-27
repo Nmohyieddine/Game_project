@@ -20,14 +20,14 @@ export interface IReponsesUpdateProps extends StateProps, DispatchProps, RouteCo
 
 export interface IReponsesUpdateState {
   isNew: boolean;
-  idreponseId: string;
+  questionsId: string;
 }
 
 export class ReponsesUpdate extends React.Component<IReponsesUpdateProps, IReponsesUpdateState> {
   constructor(props) {
     super(props);
     this.state = {
-      idreponseId: '0',
+      questionsId: '0',
       isNew: !this.props.match.params || !this.props.match.params.id
     };
   }
@@ -111,15 +111,21 @@ export class ReponsesUpdate extends React.Component<IReponsesUpdateProps, IRepon
                   />
                 </AvGroup>
                 <AvGroup>
-                  <Label for="reponses-idreponse">
-                    <Translate contentKey="backofficeApp.reponses.idreponse">Idreponse</Translate>
+                  <Label id="reponseLabel" for="reponses-reponse">
+                    <Translate contentKey="backofficeApp.reponses.reponse">Reponse</Translate>
                   </Label>
-                  <AvInput id="reponses-idreponse" type="select" className="form-control" name="idreponseId">
+                  <AvField id="reponses-reponse" type="text" name="reponse" />
+                </AvGroup>
+                <AvGroup>
+                  <Label for="reponses-questions">
+                    <Translate contentKey="backofficeApp.reponses.questions">Questions</Translate>
+                  </Label>
+                  <AvInput id="reponses-questions" type="select" className="form-control" name="questionsId">
                     <option value="" key="0" />
                     {questions
                       ? questions.map(otherEntity => (
                           <option value={otherEntity.id} key={otherEntity.id}>
-                            {otherEntity.id}
+                            {otherEntity.idquestion}
                           </option>
                         ))
                       : null}

@@ -17,7 +17,8 @@
         "title": "Reponses"
       },
       "idreponse": "Idreponse",
-      "idreponse": "Idreponse"
+      "reponse": "Reponse",
+      "questions": "Questions"
     }
   }
 }

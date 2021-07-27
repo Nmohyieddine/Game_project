@@ -16,18 +16,12 @@
     "relationships": [
         {
             "relationshipType": "one-to-many",
-            "otherEntityName": "propositions",
-            "otherEntityRelationshipName": "idquestion",
-            "relationshipName": "propositions"
-        },
-        {
-            "relationshipType": "one-to-many",
             "otherEntityName": "reponses",
-            "otherEntityRelationshipName": "idreponse",
+            "otherEntityRelationshipName": "questions",
             "relationshipName": "reponses"
         }
     ],
-    "changelogDate": "20210726161146",
+    "changelogDate": "20210727084907",
     "entityTableName": "questions",
     "dto": "mapstruct",
     "pagination": "pagination",

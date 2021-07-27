@@ -18,8 +18,6 @@ public class PropositionsDTO implements Serializable {
     private String proposition;
 
 
-    private Long idquestionId;
-
     public Long getId() {
         return id;
     }
@@ -42,14 +40,6 @@ public class PropositionsDTO implements Serializable {
 
     public void setProposition(String proposition) {
         this.proposition = proposition;
-    }
-
-    public Long getIdquestionId() {
-        return idquestionId;
-    }
-
-    public void setIdquestionId(Long questionsId) {
-        this.idquestionId = questionsId;
     }
 
     @Override
@@ -79,7 +69,6 @@ public class PropositionsDTO implements Serializable {
             "id=" + getId() +
             ", idpropositions=" + getIdpropositions() +
             ", proposition='" + getProposition() + "'" +
-            ", idquestion=" + getIdquestionId() +
             "}";
     }
 }

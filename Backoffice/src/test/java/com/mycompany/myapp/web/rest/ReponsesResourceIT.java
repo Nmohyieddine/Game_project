@@ -39,6 +39,9 @@ public class ReponsesResourceIT {
     private static final Integer DEFAULT_IDREPONSE = 1;
     private static final Integer UPDATED_IDREPONSE = 2;
 
+    private static final String DEFAULT_REPONSE = "AAAAAAAAAA";
+    private static final String UPDATED_REPONSE = "BBBBBBBBBB";
+
     @Autowired
     private ReponsesRepository reponsesRepository;
 
@@ -87,7 +90,8 @@ public class ReponsesResourceIT {
      */
     public static Reponses createEntity(EntityManager em) {
         Reponses reponses = new Reponses()
-            .idreponse(DEFAULT_IDREPONSE);
+            .idreponse(DEFAULT_IDREPONSE)
+            .reponse(DEFAULT_REPONSE);
         return reponses;
     }
     /**
@@ -98,7 +102,8 @@ public class ReponsesResourceIT {
      */
     public static Reponses createUpdatedEntity(EntityManager em) {
         Reponses reponses = new Reponses()
-            .idreponse(UPDATED_IDREPONSE);
+            .idreponse(UPDATED_IDREPONSE)
+            .reponse(UPDATED_REPONSE);
         return reponses;
     }
 
@@ -124,6 +129,7 @@ public class ReponsesResourceIT {
         assertThat(reponsesList).hasSize(databaseSizeBeforeCreate + 1);
         Reponses testReponses = reponsesList.get(reponsesList.size() - 1);
         assertThat(testReponses.getIdreponse()).isEqualTo(DEFAULT_IDREPONSE);
+        assertThat(testReponses.getReponse()).isEqualTo(DEFAULT_REPONSE);
     }
 
     @Test
@@ -177,7 +183,8 @@ public class ReponsesResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(reponses.getId().intValue())))
-            .andExpect(jsonPath("$.[*].idreponse").value(hasItem(DEFAULT_IDREPONSE)));
+            .andExpect(jsonPath("$.[*].idreponse").value(hasItem(DEFAULT_IDREPONSE)))
+            .andExpect(jsonPath("$.[*].reponse").value(hasItem(DEFAULT_REPONSE.toString())));
     }
     
     @Test
@@ -191,7 +198,8 @@ public class ReponsesResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(reponses.getId().intValue()))
-            .andExpect(jsonPath("$.idreponse").value(DEFAULT_IDREPONSE));
+            .andExpect(jsonPath("$.idreponse").value(DEFAULT_IDREPONSE))
+            .andExpect(jsonPath("$.reponse").value(DEFAULT_REPONSE.toString()));
     }
 
     @Test
@@ -215,7 +223,8 @@ public class ReponsesResourceIT {
         // Disconnect from session so that the updates on updatedReponses are not directly saved in db
         em.detach(updatedReponses);
         updatedReponses
-            .idreponse(UPDATED_IDREPONSE);
+            .idreponse(UPDATED_IDREPONSE)
+            .reponse(UPDATED_REPONSE);
         ReponsesDTO reponsesDTO = reponsesMapper.toDto(updatedReponses);
 
         restReponsesMockMvc.perform(put("/api/reponses")
@@ -228,6 +237,7 @@ public class ReponsesResourceIT {
         assertThat(reponsesList).hasSize(databaseSizeBeforeUpdate);
         Reponses testReponses = reponsesList.get(reponsesList.size() - 1);
         assertThat(testReponses.getIdreponse()).isEqualTo(UPDATED_IDREPONSE);
+        assertThat(testReponses.getReponse()).isEqualTo(UPDATED_REPONSE);
     }
 
     @Test

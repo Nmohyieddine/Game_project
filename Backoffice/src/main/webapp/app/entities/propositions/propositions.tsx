@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 // tslint:disable-next-line:no-unused-variable
-import { Translate, ICrudGetAllAction } from 'react-jhipster';
+import { Translate, ICrudGetAllAction, getSortState, IPaginationBaseState, JhiPagination, JhiItemCount } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { IRootState } from 'app/shared/reducers';
@@ -11,16 +11,45 @@ import { getEntities } from './propositions.reducer';
 import { IPropositions } from 'app/shared/model/propositions.model';
 // tslint:disable-next-line:no-unused-variable
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { ITEMS_PER_PAGE } from 'app/shared/util/pagination.constants';
 
 export interface IPropositionsProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
 
-export class Propositions extends React.Component<IPropositionsProps> {
+export type IPropositionsState = IPaginationBaseState;
+
+export class Propositions extends React.Component<IPropositionsProps, IPropositionsState> {
+  state: IPropositionsState = {
+    ...getSortState(this.props.location, ITEMS_PER_PAGE)
+  };
+
   componentDidMount() {
-    this.props.getEntities();
+    this.getEntities();
   }
 
+  sort = prop => () => {
+    this.setState(
+      {
+        order: this.state.order === 'asc' ? 'desc' : 'asc',
+        sort: prop
+      },
+      () => this.sortEntities()
+    );
+  };
+
+  sortEntities() {
+    this.getEntities();
+    this.props.history.push(`${this.props.location.pathname}?page=${this.state.activePage}&sort=${this.state.sort},${this.state.order}`);
+  }
+
+  handlePagination = activePage => this.setState({ activePage }, () => this.sortEntities());
+
+  getEntities = () => {
+    const { activePage, itemsPerPage, sort, order } = this.state;
+    this.props.getEntities(activePage - 1, itemsPerPage, `${sort},${order}`);
+  };
+
   render() {
-    const { propositionsList, match } = this.props;
+    const { propositionsList, match, totalItems } = this.props;
     return (
       <div>
         <h2 id="propositions-heading">
@@ -36,17 +65,15 @@ export class Propositions extends React.Component<IPropositionsProps> {
             <Table responsive>
               <thead>
                 <tr>
-                  <th>
-                    <Translate contentKey="global.field.id">ID</Translate>
+                  <th className="hand" onClick={this.sort('id')}>
+                    <Translate contentKey="global.field.id">ID</Translate> <FontAwesomeIcon icon="sort" />
                   </th>
-                  <th>
-                    <Translate contentKey="backofficeApp.propositions.idpropositions">Idpropositions</Translate>
+                  <th className="hand" onClick={this.sort('idpropositions')}>
+                    <Translate contentKey="backofficeApp.propositions.idpropositions">Idpropositions</Translate>{' '}
+                    <FontAwesomeIcon icon="sort" />
                   </th>
-                  <th>
-                    <Translate contentKey="backofficeApp.propositions.proposition">Proposition</Translate>
-                  </th>
-                  <th>
-                    <Translate contentKey="backofficeApp.propositions.idquestion">Idquestion</Translate>
+                  <th className="hand" onClick={this.sort('proposition')}>
+                    <Translate contentKey="backofficeApp.propositions.proposition">Proposition</Translate> <FontAwesomeIcon icon="sort" />
                   </th>
                   <th />
                 </tr>
@@ -61,13 +88,6 @@ export class Propositions extends React.Component<IPropositionsProps> {
                     </td>
                     <td>{propositions.idpropositions}</td>
                     <td>{propositions.proposition}</td>
-                    <td>
-                      {propositions.idquestionId ? (
-                        <Link to={`questions/${propositions.idquestionId}`}>{propositions.idquestionId}</Link>
-                      ) : (
-                        ''
-                      )}
-                    </td>
                     <td className="text-right">
                       <div className="btn-group flex-btn-group-container">
                         <Button tag={Link} to={`${match.url}/${propositions.id}`} color="info" size="sm">
@@ -100,13 +120,28 @@ export class Propositions extends React.Component<IPropositionsProps> {
             </div>
           )}
         </div>
+        <div className={propositionsList && propositionsList.length > 0 ? '' : 'd-none'}>
+          <Row className="justify-content-center">
+            <JhiItemCount page={this.state.activePage} total={totalItems} itemsPerPage={this.state.itemsPerPage} i18nEnabled />
+          </Row>
+          <Row className="justify-content-center">
+            <JhiPagination
+              activePage={this.state.activePage}
+              onSelect={this.handlePagination}
+              maxButtons={5}
+              itemsPerPage={this.state.itemsPerPage}
+              totalItems={this.props.totalItems}
+            />
+          </Row>
+        </div>
       </div>
     );
   }
 }
 
 const mapStateToProps = ({ propositions }: IRootState) => ({
-  propositionsList: propositions.entities
+  propositionsList: propositions.entities,
+  totalItems: propositions.totalItems
 });
 
 const mapDispatchToProps = {

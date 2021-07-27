@@ -1,17 +1,20 @@
 
+
+
+
 entity Questions {
-	idquestion Integer required
+	idquestion Integer required,
 	question String
 }
 
 
 entity Reponses {
-	idreponse Integer required
+	idreponse Integer required,
+	
 }
 
 
-// an ignored comment
-/** not an ignored comment */
+
 
 
 entity Propositions {
@@ -19,23 +22,24 @@ entity Propositions {
 	proposition String
 }
 
+relationship OneToOne {
+
+	Reponses{proposition} to Propositions,
 
 
+}
+relationship OneToOne {
 
 
+	Reponses{question} to Questions
 
-
-
-relationship OneToMany {
-	Questions to Propositions{idquestion}
 }
 
-
 relationship OneToMany {
-	Questions to Reponses{idreponse}
+
+	Questions{IDQUESTION} to Propositions{Questions(idquestion)},
+
 }
-
-
 
 
 
@@ -45,7 +49,7 @@ relationship OneToMany {
 
 // Set pagination options
 
-paginate Questions with pagination
+paginate Questions,Propositions with pagination
 
 //paginate Job with pagination
 
@@ -53,7 +57,7 @@ paginate Questions with pagination
 dto * with mapstruct
 
 // Set service options to all except few
-service all with serviceImpl 
+service all with serviceImpl
 
 // Set an angular suffix
 // angularSuffix * with mySuffix

@@ -8,14 +8,10 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link Propositions} and its DTO {@link PropositionsDTO}.
  */
-@Mapper(componentModel = "spring", uses = {QuestionsMapper.class})
+@Mapper(componentModel = "spring", uses = {})
 public interface PropositionsMapper extends EntityMapper<PropositionsDTO, Propositions> {
 
-    @Mapping(source = "idquestion.id", target = "idquestionId")
-    PropositionsDTO toDto(Propositions propositions);
 
-    @Mapping(source = "idquestionId", target = "idquestion")
-    Propositions toEntity(PropositionsDTO propositionsDTO);
 
     default Propositions fromId(Long id) {
         if (id == null) {

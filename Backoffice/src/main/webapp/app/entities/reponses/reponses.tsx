@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 // tslint:disable-next-line:no-unused-variable
-import { Translate, ICrudGetAllAction } from 'react-jhipster';
+import { Translate, ICrudGetAllAction, getSortState, IPaginationBaseState, JhiPagination, JhiItemCount } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { IRootState } from 'app/shared/reducers';
@@ -11,16 +11,45 @@ import { getEntities } from './reponses.reducer';
 import { IReponses } from 'app/shared/model/reponses.model';
 // tslint:disable-next-line:no-unused-variable
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { ITEMS_PER_PAGE } from 'app/shared/util/pagination.constants';
 
 export interface IReponsesProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
 
-export class Reponses extends React.Component<IReponsesProps> {
+export type IReponsesState = IPaginationBaseState;
+
+export class Reponses extends React.Component<IReponsesProps, IReponsesState> {
+  state: IReponsesState = {
+    ...getSortState(this.props.location, ITEMS_PER_PAGE)
+  };
+
   componentDidMount() {
-    this.props.getEntities();
+    this.getEntities();
   }
 
+  sort = prop => () => {
+    this.setState(
+      {
+        order: this.state.order === 'asc' ? 'desc' : 'asc',
+        sort: prop
+      },
+      () => this.sortEntities()
+    );
+  };
+
+  sortEntities() {
+    this.getEntities();
+    this.props.history.push(`${this.props.location.pathname}?page=${this.state.activePage}&sort=${this.state.sort},${this.state.order}`);
+  }
+
+  handlePagination = activePage => this.setState({ activePage }, () => this.sortEntities());
+
+  getEntities = () => {
+    const { activePage, itemsPerPage, sort, order } = this.state;
+    this.props.getEntities(activePage - 1, itemsPerPage, `${sort},${order}`);
+  };
+
   render() {
-    const { reponsesList, match } = this.props;
+    const { reponsesList, match, totalItems } = this.props;
     return (
       <div>
         <h2 id="reponses-heading">
@@ -36,14 +65,17 @@ export class Reponses extends React.Component<IReponsesProps> {
             <Table responsive>
               <thead>
                 <tr>
-                  <th>
-                    <Translate contentKey="global.field.id">ID</Translate>
+                  <th className="hand" onClick={this.sort('id')}>
+                    <Translate contentKey="global.field.id">ID</Translate> <FontAwesomeIcon icon="sort" />
+                  </th>
+                  <th className="hand" onClick={this.sort('idreponse')}>
+                    <Translate contentKey="backofficeApp.reponses.idreponse">Idreponse</Translate> <FontAwesomeIcon icon="sort" />
+                  </th>
+                  <th className="hand" onClick={this.sort('reponse')}>
+                    <Translate contentKey="backofficeApp.reponses.reponse">Reponse</Translate> <FontAwesomeIcon icon="sort" />
                   </th>
                   <th>
-                    <Translate contentKey="backofficeApp.reponses.idreponse">Idreponse</Translate>
-                  </th>
-                  <th>
-                    <Translate contentKey="backofficeApp.reponses.idreponse">Idreponse</Translate>
+                    <Translate contentKey="backofficeApp.reponses.questions">Questions</Translate> <FontAwesomeIcon icon="sort" />
                   </th>
                   <th />
                 </tr>
@@ -57,7 +89,14 @@ export class Reponses extends React.Component<IReponsesProps> {
                       </Button>
                     </td>
                     <td>{reponses.idreponse}</td>
-                    <td>{reponses.idreponseId ? <Link to={`questions/${reponses.idreponseId}`}>{reponses.idreponseId}</Link> : ''}</td>
+                    <td>{reponses.reponse}</td>
+                    <td>
+                      {reponses.questionsIdquestion ? (
+                        <Link to={`questions/${reponses.questionsId}`}>{reponses.questionsIdquestion}</Link>
+                      ) : (
+                        ''
+                      )}
+                    </td>
                     <td className="text-right">
                       <div className="btn-group flex-btn-group-container">
                         <Button tag={Link} to={`${match.url}/${reponses.id}`} color="info" size="sm">
@@ -90,13 +129,28 @@ export class Reponses extends React.Component<IReponsesProps> {
             </div>
           )}
         </div>
+        <div className={reponsesList && reponsesList.length > 0 ? '' : 'd-none'}>
+          <Row className="justify-content-center">
+            <JhiItemCount page={this.state.activePage} total={totalItems} itemsPerPage={this.state.itemsPerPage} i18nEnabled />
+          </Row>
+          <Row className="justify-content-center">
+            <JhiPagination
+              activePage={this.state.activePage}
+              onSelect={this.handlePagination}
+              maxButtons={5}
+              itemsPerPage={this.state.itemsPerPage}
+              totalItems={this.props.totalItems}
+            />
+          </Row>
+        </div>
       </div>
     );
   }
 }
 
 const mapStateToProps = ({ reponses }: IRootState) => ({
-  reponsesList: reponses.entities
+  reponsesList: reponses.entities,
+  totalItems: reponses.totalItems
 });
 
 const mapDispatchToProps = {

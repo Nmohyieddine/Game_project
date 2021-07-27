@@ -2,7 +2,9 @@ package com.mycompany.myapp.service;
 
 import com.mycompany.myapp.service.dto.ReponsesDTO;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.Optional;
 
 /**
@@ -21,9 +23,10 @@ public interface ReponsesService {
     /**
      * Get all the reponses.
      *
+     * @param pageable the pagination information.
      * @return the list of entities.
      */
-    List<ReponsesDTO> findAll();
+    Page<ReponsesDTO> findAll(Pageable pageable);
 
 
     /**

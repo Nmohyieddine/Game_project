@@ -8,8 +8,6 @@ import { Translate, translate, ICrudGetAction, ICrudGetAllAction, ICrudPutAction
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IRootState } from 'app/shared/reducers';
 
-import { IQuestions } from 'app/shared/model/questions.model';
-import { getEntities as getQuestions } from 'app/entities/questions/questions.reducer';
 import { getEntity, updateEntity, createEntity, reset } from './propositions.reducer';
 import { IPropositions } from 'app/shared/model/propositions.model';
 // tslint:disable-next-line:no-unused-variable
@@ -20,14 +18,12 @@ export interface IPropositionsUpdateProps extends StateProps, DispatchProps, Rou
 
 export interface IPropositionsUpdateState {
   isNew: boolean;
-  idquestionId: string;
 }
 
 export class PropositionsUpdate extends React.Component<IPropositionsUpdateProps, IPropositionsUpdateState> {
   constructor(props) {
     super(props);
     this.state = {
-      idquestionId: '0',
       isNew: !this.props.match.params || !this.props.match.params.id
     };
   }
@@ -44,8 +40,6 @@ export class PropositionsUpdate extends React.Component<IPropositionsUpdateProps
     } else {
       this.props.getEntity(this.props.match.params.id);
     }
-
-    this.props.getQuestions();
   }
 
   saveEntity = (event, errors, values) => {
@@ -69,7 +63,7 @@ export class PropositionsUpdate extends React.Component<IPropositionsUpdateProps
   };
 
   render() {
-    const { propositionsEntity, questions, loading, updating } = this.props;
+    const { propositionsEntity, loading, updating } = this.props;
     const { isNew } = this.state;
 
     return (
@@ -116,21 +110,6 @@ export class PropositionsUpdate extends React.Component<IPropositionsUpdateProps
                   </Label>
                   <AvField id="propositions-proposition" type="text" name="proposition" />
                 </AvGroup>
-                <AvGroup>
-                  <Label for="propositions-idquestion">
-                    <Translate contentKey="backofficeApp.propositions.idquestion">Idquestion</Translate>
-                  </Label>
-                  <AvInput id="propositions-idquestion" type="select" className="form-control" name="idquestionId">
-                    <option value="" key="0" />
-                    {questions
-                      ? questions.map(otherEntity => (
-                          <option value={otherEntity.id} key={otherEntity.id}>
-                            {otherEntity.id}
-                          </option>
-                        ))
-                      : null}
-                  </AvInput>
-                </AvGroup>
                 <Button tag={Link} id="cancel-save" to="/entity/propositions" replace color="info">
                   <FontAwesomeIcon icon="arrow-left" />
                   &nbsp;
@@ -154,7 +133,6 @@ export class PropositionsUpdate extends React.Component<IPropositionsUpdateProps
 }
 
 const mapStateToProps = (storeState: IRootState) => ({
-  questions: storeState.questions.entities,
   propositionsEntity: storeState.propositions.entity,
   loading: storeState.propositions.loading,
   updating: storeState.propositions.updating,
@@ -162,7 +140,6 @@ const mapStateToProps = (storeState: IRootState) => ({
 });
 
 const mapDispatchToProps = {
-  getQuestions,
   getEntity,
   updateEntity,
   createEntity,

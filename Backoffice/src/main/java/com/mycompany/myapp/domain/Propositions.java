@@ -1,5 +1,4 @@
 package com.mycompany.myapp.domain;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -28,10 +27,6 @@ public class Propositions implements Serializable {
 
     @Column(name = "proposition")
     private String proposition;
-
-    @ManyToOne
-    @JsonIgnoreProperties("propositions")
-    private Questions idquestion;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -66,19 +61,6 @@ public class Propositions implements Serializable {
 
     public void setProposition(String proposition) {
         this.proposition = proposition;
-    }
-
-    public Questions getIdquestion() {
-        return idquestion;
-    }
-
-    public Propositions idquestion(Questions questions) {
-        this.idquestion = questions;
-        return this;
-    }
-
-    public void setIdquestion(Questions questions) {
-        this.idquestion = questions;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 

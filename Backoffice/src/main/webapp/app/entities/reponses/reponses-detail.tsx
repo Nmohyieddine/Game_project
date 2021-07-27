@@ -35,9 +35,15 @@ export class ReponsesDetail extends React.Component<IReponsesDetailProps> {
             </dt>
             <dd>{reponsesEntity.idreponse}</dd>
             <dt>
-              <Translate contentKey="backofficeApp.reponses.idreponse">Idreponse</Translate>
+              <span id="reponse">
+                <Translate contentKey="backofficeApp.reponses.reponse">Reponse</Translate>
+              </span>
             </dt>
-            <dd>{reponsesEntity.idreponseId ? reponsesEntity.idreponseId : ''}</dd>
+            <dd>{reponsesEntity.reponse}</dd>
+            <dt>
+              <Translate contentKey="backofficeApp.reponses.questions">Questions</Translate>
+            </dt>
+            <dd>{reponsesEntity.questionsIdquestion ? reponsesEntity.questionsIdquestion : ''}</dd>
           </dl>
           <Button tag={Link} to="/entity/reponses" replace color="info">
             <FontAwesomeIcon icon="arrow-left" />{' '}

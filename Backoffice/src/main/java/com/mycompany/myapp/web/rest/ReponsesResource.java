@@ -5,10 +5,17 @@ import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import com.mycompany.myapp.service.dto.ReponsesDTO;
 
 import io.github.jhipster.web.util.HeaderUtil;
+import io.github.jhipster.web.util.PaginationUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -82,12 +89,17 @@ public class ReponsesResource {
     /**
      * {@code GET  /reponses} : get all the reponses.
      *
+     * @param pageable the pagination information.
+     * @param queryParams a {@link MultiValueMap} query parameters.
+     * @param uriBuilder a {@link UriComponentsBuilder} URI builder.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of reponses in body.
      */
     @GetMapping("/reponses")
-    public List<ReponsesDTO> getAllReponses() {
-        log.debug("REST request to get all Reponses");
-        return reponsesService.findAll();
+    public ResponseEntity<List<ReponsesDTO>> getAllReponses(Pageable pageable, @RequestParam MultiValueMap<String, String> queryParams, UriComponentsBuilder uriBuilder) {
+        log.debug("REST request to get a page of Reponses");
+        Page<ReponsesDTO> page = reponsesService.findAll(pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(uriBuilder.queryParams(queryParams), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
     /**

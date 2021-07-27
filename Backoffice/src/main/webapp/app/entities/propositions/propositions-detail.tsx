@@ -40,10 +40,6 @@ export class PropositionsDetail extends React.Component<IPropositionsDetailProps
               </span>
             </dt>
             <dd>{propositionsEntity.proposition}</dd>
-            <dt>
-              <Translate contentKey="backofficeApp.propositions.idquestion">Idquestion</Translate>
-            </dt>
-            <dd>{propositionsEntity.idquestionId ? propositionsEntity.idquestionId : ''}</dd>
           </dl>
           <Button tag={Link} to="/entity/propositions" replace color="info">
             <FontAwesomeIcon icon="arrow-left" />{' '}

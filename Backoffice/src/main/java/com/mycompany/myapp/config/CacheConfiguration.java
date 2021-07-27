@@ -51,6 +51,7 @@ public class CacheConfiguration {
             createCache(cm, com.mycompany.myapp.domain.Questions.class.getName() + ".questiongames");
             createCache(cm, com.mycompany.myapp.domain.Questions.class.getName() + ".propositions");
             createCache(cm, com.mycompany.myapp.domain.Questions.class.getName() + ".reponses");
+            createCache(cm, com.mycompany.myapp.domain.Questions.class.getName() + ".iDQUESTIONS");
             // jhipster-needle-ehcache-add-entry
         };
     }

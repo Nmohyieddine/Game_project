@@ -30,11 +30,7 @@ public class Questions implements Serializable {
     @Column(name = "question")
     private String question;
 
-    @OneToMany(mappedBy = "idquestion")
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private Set<Propositions> propositions = new HashSet<>();
-
-    @OneToMany(mappedBy = "idreponse")
+    @OneToMany(mappedBy = "questions")
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<Reponses> reponses = new HashSet<>();
 
@@ -73,31 +69,6 @@ public class Questions implements Serializable {
         this.question = question;
     }
 
-    public Set<Propositions> getPropositions() {
-        return propositions;
-    }
-
-    public Questions propositions(Set<Propositions> propositions) {
-        this.propositions = propositions;
-        return this;
-    }
-
-    public Questions addPropositions(Propositions propositions) {
-        this.propositions.add(propositions);
-        propositions.setIdquestion(this);
-        return this;
-    }
-
-    public Questions removePropositions(Propositions propositions) {
-        this.propositions.remove(propositions);
-        propositions.setIdquestion(null);
-        return this;
-    }
-
-    public void setPropositions(Set<Propositions> propositions) {
-        this.propositions = propositions;
-    }
-
     public Set<Reponses> getReponses() {
         return reponses;
     }
@@ -109,13 +80,13 @@ public class Questions implements Serializable {
 
     public Questions addReponses(Reponses reponses) {
         this.reponses.add(reponses);
-        reponses.setIdreponse(this);
+        reponses.setQuestions(this);
         return this;
     }
 
     public Questions removeReponses(Reponses reponses) {
         this.reponses.remove(reponses);
-        reponses.setIdreponse(null);
+        reponses.setQuestions(null);
         return this;
     }
 

@@ -13,20 +13,12 @@
             "fieldType": "String"
         }
     ],
-    "relationships": [
-        {
-            "relationshipType": "many-to-one",
-            "otherEntityName": "questions",
-            "otherEntityRelationshipName": "propositions",
-            "relationshipName": "idquestion",
-            "otherEntityField": "id"
-        }
-    ],
-    "changelogDate": "20210726155545",
+    "relationships": [],
+    "changelogDate": "20210727084909",
     "javadoc": "not an ignored comment",
     "entityTableName": "propositions",
     "dto": "mapstruct",
-    "pagination": "no",
+    "pagination": "pagination",
     "service": "serviceImpl",
     "jpaMetamodelFiltering": false,
     "fluentMethods": true,
