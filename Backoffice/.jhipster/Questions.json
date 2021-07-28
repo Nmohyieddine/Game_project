@@ -1,0 +1,33 @@
+{
+    "name": "Questions",
+    "fields": [
+        {
+            "fieldName": "idquestion",
+            "fieldType": "Integer",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "question",
+            "fieldType": "String"
+        }
+    ],
+    "relationships": [
+        {
+            "relationshipType": "one-to-many",
+            "otherEntityName": "propositions",
+            "otherEntityRelationshipName": "questions",
+            "relationshipName": "iDQUESTION"
+        }
+    ],
+    "changelogDate": "20210728104004",
+    "entityTableName": "questions",
+    "dto": "mapstruct",
+    "pagination": "pagination",
+    "service": "serviceImpl",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "applications": "*"
+}

@@ -816,7 +816,7 @@
                         <groupId>com.github.eirslett</groupId>
                         <artifactId>frontend-maven-plugin</artifactId>
                         <executions>
-                            <execution>
+                            <!--<execution>
                                 <id>install node and npm</id>
                                 <goals>
                                     <goal>install-node-and-npm</goal>
@@ -842,7 +842,7 @@
                                     <arguments>run webpack:build</arguments>
                                     <npmInheritsProxyConfigFromMaven>false</npmInheritsProxyConfigFromMaven>
                                 </configuration>
-                            </execution>
+                            </execution>-->
                         </executions>
                     </plugin>
                 </plugins>

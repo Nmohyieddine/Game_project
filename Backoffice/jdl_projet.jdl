@@ -1,0 +1,63 @@
+
+
+
+
+entity Questions {
+	idquestion Integer required,
+	question String
+}
+
+
+entity Reponses {
+	idreponse Integer required,
+	
+}
+
+
+
+
+
+entity Propositions {
+	idpropositions Integer required,
+	proposition String
+}
+
+relationship OneToOne {
+
+	Reponses{proposition} to Propositions,
+
+
+}
+relationship OneToOne {
+
+
+	Reponses{question} to Questions
+
+}
+
+relationship OneToMany {
+
+	Questions{IDQUESTION} to Propositions{Questions(idquestion)},
+
+}
+
+
+
+
+
+
+
+// Set pagination options
+
+paginate Questions,Propositions with pagination
+
+//paginate Job with pagination
+
+// Use Data Transfer Objects (DTO)
+dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl
+
+// Set an angular suffix
+// angularSuffix * with mySuffix

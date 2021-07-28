@@ -1,0 +1,39 @@
+{
+    "name": "Reponses",
+    "fields": [
+        {
+            "fieldName": "idreponse",
+            "fieldType": "Integer",
+            "fieldValidateRules": [
+                "required"
+            ]
+        }
+    ],
+    "relationships": [
+        {
+            "relationshipType": "one-to-one",
+            "otherEntityName": "propositions",
+            "otherEntityRelationshipName": "reponses",
+            "relationshipName": "proposition",
+            "otherEntityField": "id",
+            "ownerSide": true
+        },
+        {
+            "relationshipType": "one-to-one",
+            "otherEntityName": "questions",
+            "otherEntityRelationshipName": "reponses",
+            "relationshipName": "question",
+            "otherEntityField": "id",
+            "ownerSide": true
+        }
+    ],
+    "changelogDate": "20210728104005",
+    "entityTableName": "reponses",
+    "dto": "mapstruct",
+    "pagination": "no",
+    "service": "serviceImpl",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "applications": "*"
+}
