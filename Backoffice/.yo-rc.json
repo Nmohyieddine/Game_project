@@ -1,8 +1,7 @@
 {
   "generator-jhipster": {
     "promptValues": {
-      "packageName": "com.mycompany.myapp",
-      "nativeLanguage": "en"
+      "packageName": "com.mycompany.myapp"
     },
     "jhipsterVersion": "6.1.2",
     "applicationType": "monolith",
@@ -22,7 +21,7 @@
     "serviceDiscoveryType": false,
     "buildTool": "maven",
     "enableSwaggerCodegen": false,
-    "jwtSecretKey": "YjcyYWQ3NWMzMWJjOTBkZjExMDhiMjBkNmM4ZmI5ZmU4NGM4MWJmM2FkYjFlYzNmYmUyNWQwMmExNzY2Mjg5NzZhZWMzYTcwZjg5NmViZjNmOThkNzhkM2ZjMTM3NDIwMGZkYzg2YTQ3MTFhZTU0NGQxZTRjMjk4NDZmMmRkNTU=",
+    "jwtSecretKey": "NGJkZTg1YmE0YmMyMmI5NzdkNDNmZDc4MzVmNGM5MjFiODk1YzRlMDJlNWViMmViNzQ3ZWU4NmMwZDY1NjhmOWFkMjJjY2QwOTZjNmM3ZjA5ZmZjMjhmNmI2ODViOTEzMTA2ZmJiMTg0N2M4MTUzNjMxZmM5MTY3OTVjYjRkMzI=",
     "useSass": true,
     "clientPackageManager": "npm",
     "clientFramework": "react",
@@ -33,8 +32,6 @@
     "entitySuffix": "",
     "dtoSuffix": "DTO",
     "otherModules": [],
-    "enableTranslation": true,
-    "nativeLanguage": "en",
-    "languages": ["en"]
+    "enableTranslation": false
   }
 }

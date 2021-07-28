@@ -43,15 +43,6 @@ public class CacheConfiguration {
             createCache(cm, com.mycompany.myapp.domain.User.class.getName());
             createCache(cm, com.mycompany.myapp.domain.Authority.class.getName());
             createCache(cm, com.mycompany.myapp.domain.User.class.getName() + ".authorities");
-            createCache(cm, com.mycompany.myapp.domain.Questions.class.getName());
-            createCache(cm, com.mycompany.myapp.domain.Questions.class.getName() + ".questions");
-            createCache(cm, com.mycompany.myapp.domain.Reponses.class.getName());
-            createCache(cm, com.mycompany.myapp.domain.Propositions.class.getName());
-            createCache(cm, com.mycompany.myapp.domain.Questions.class.getName() + ".ques");
-            createCache(cm, com.mycompany.myapp.domain.Questions.class.getName() + ".questiongames");
-            createCache(cm, com.mycompany.myapp.domain.Questions.class.getName() + ".propositions");
-            createCache(cm, com.mycompany.myapp.domain.Questions.class.getName() + ".reponses");
-            createCache(cm, com.mycompany.myapp.domain.Questions.class.getName() + ".iDQUESTIONS");
             // jhipster-needle-ehcache-add-entry
         };
     }
