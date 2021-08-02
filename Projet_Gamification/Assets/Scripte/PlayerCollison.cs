@@ -1,9 +1,12 @@
-﻿
+
 using System.Threading;
 using System.Net.Mime;
 using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.UI;
+
+
+
 public class PlayerCollison : MonoBehaviour {
 
 	// Use this for initialization
@@ -19,13 +22,13 @@ public class PlayerCollison : MonoBehaviour {
 
 	public GameObject PausePanel;
 
-	public Text popuptext;
 
-	public Text quizQuestion;
 
 	public Text Textetoile;
 
 	public Text Textdiamond;
+
+	public Text popuptext;
 
 	
 
@@ -36,6 +39,8 @@ public class PlayerCollison : MonoBehaviour {
 		quizPanel.SetActive(false);
 		PanelExplication.SetActive(false);
 		PausePanel.SetActive(false);
+		
+
 
 		
 
@@ -99,7 +104,7 @@ public class PlayerCollison : MonoBehaviour {
 				//quizQuestion.text=Scripte4DB.Showquestion(1);
 
 
-				//popPanel.SetActive(true);
+			
 
 				//quizPanel.SetActive(true);
 

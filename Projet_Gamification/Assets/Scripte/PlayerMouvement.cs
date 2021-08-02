@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class PlayerMouvement : MonoBehaviour {
 
@@ -11,15 +13,15 @@ public class PlayerMouvement : MonoBehaviour {
 	public static float Forwardforce=50f;
 	public static float Sideforce=5f;
 
+
 	public bool RightAction=false;
 	public bool LeftAction=false;
 
 
 	void Start () {
-		//Debug.Log("hello world");
+		//UnityEngine.Debug.Log("hello world");
 		//rb.AddForce(200 , 0 , 500);
-
-
+		
 
 		
 	}
@@ -94,6 +96,8 @@ public class PlayerMouvement : MonoBehaviour {
 
 			
 		}
+
+	
 
 
 

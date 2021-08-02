@@ -14,19 +14,19 @@ public class Scripte4DB : MonoBehaviour
 
     public static List<string> TablProposition;
     public static int nbr_reponse;
+    public List<Question> listquestions;
 
     
     // Start is called before the first frame update
     void Start()
     {
         CreateDB();
-         
-        Addanswer(2,3,"hello");
-        addproposition(1,3,"oui");
-        UnityEngine.Debug.Log(counterproposition(3));
 
-        UnityEngine.Debug.Log(groupProposition(3)[0]);
-        
+        Questions_controler.QuestionContoler(listquestions);
+
+        UnityEngine.Debug.Log(listquestions[1].idquestion);
+
+     
        
         
         
@@ -36,7 +36,7 @@ public class Scripte4DB : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-          
+        
     }
 
 
@@ -133,7 +133,7 @@ public class Scripte4DB : MonoBehaviour
 
 
 
-                      TablProposition.Add((string)reader["proposition"]);
+                      //TablProposition.Add((string)reader["proposition"]);
                       
 
 
