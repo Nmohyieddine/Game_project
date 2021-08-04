@@ -11,24 +11,19 @@ public class Scripte4DB : MonoBehaviour
 
     private static string dbName =@"Data Source=C:\Users\zmiloudi\Desktop\Game_project\Projet_Gamification\Assets\Scripte\QuesionsDB.db,Version=3";
     public static string Val;
-
-    public static List<string> TablProposition;
     public static int nbr_reponse;
-    public List<Question> listquestions;
+    public static List<String> TablProposition;
+
+
 
     
     // Start is called before the first frame update
     void Start()
     {
         CreateDB();
-
-        Questions_controler.QuestionContoler(listquestions);
-
-        UnityEngine.Debug.Log(listquestions[1].idquestion);
-
-     
-       
         
+        
+
         
     }
 
@@ -36,6 +31,10 @@ public class Scripte4DB : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        //QuestionContoler(listeQuestion);
+
+        //UnityEngine.Debug.Log(listeQuestion[0].idquestion);
         
     }
 

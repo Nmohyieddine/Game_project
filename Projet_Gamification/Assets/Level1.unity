@@ -2838,6 +2838,51 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!1 &1268649136
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1268649138}
+  - component: {fileID: 1268649137}
+  m_Layer: 0
+  m_Name: ApiControler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1268649137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1268649136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee26b4232ba7f3949ad3ac3c0ff70468, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  listquestions: []
+  listpropositions: []
+--- !u!4 &1268649138
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1268649136}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -33.239964, y: 186.43701, z: 124.0101}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1271004126
 GameObject:
   m_ObjectHideFlags: 0
@@ -3412,10 +3457,9 @@ MonoBehaviour:
   quizPanel: {fileID: 117260226}
   PanelExplication: {fileID: 1209689706}
   PausePanel: {fileID: 2043904115}
-  popuptext: {fileID: 908143107}
-  quizQuestion: {fileID: 160753581}
   Textetoile: {fileID: 194994083}
   Textdiamond: {fileID: 113548939}
+  popuptext: {fileID: 908143107}
 --- !u!65 &1487109704
 BoxCollider:
   m_ObjectHideFlags: 0
