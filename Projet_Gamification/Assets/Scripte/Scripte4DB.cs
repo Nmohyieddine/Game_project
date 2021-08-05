@@ -6,6 +6,9 @@ using System.Data;
 using UnityEngine;
 using Mono.Data.Sqlite;
 using UnityEngine.UI;
+
+
+
 public class Scripte4DB : MonoBehaviour
 {
 
@@ -14,6 +17,9 @@ public class Scripte4DB : MonoBehaviour
     public static int nbr_reponse;
     public static List<String> TablProposition;
 
+   
+   
+
 
 
     
@@ -21,6 +27,11 @@ public class Scripte4DB : MonoBehaviour
     void Start()
     {
         CreateDB();
+        TestingQuestionExistance("hello");
+        
+        
+        
+        
         
         
 
@@ -35,6 +46,8 @@ public class Scripte4DB : MonoBehaviour
         //QuestionContoler(listeQuestion);
 
         //UnityEngine.Debug.Log(listeQuestion[0].idquestion);
+
+
         
     }
 
@@ -47,15 +60,15 @@ public class Scripte4DB : MonoBehaviour
 
             using(var command1 = connection.CreateCommand()){
 
-                command1.CommandText="CREATE TABLE IF NOT EXISTS Questions (ID INT , question TEXT );";
+                command1.CommandText="CREATE TABLE IF NOT EXISTS Questions (idquestion INT , question TEXT );";
                 command1.ExecuteNonQuery();
             }using(var command2 = connection.CreateCommand()){
 
-                command2.CommandText="CREATE TABLE IF NOT EXISTS Reponses ( ID	INT, fk_question	TEXT , reponse TEXT, FOREIGN KEY (fk_question) REFERENCES Questions(ID)  );";
+                command2.CommandText="CREATE TABLE IF NOT EXISTS Reponses ( idreponse	INT, reponse TEXT, idquestion INT, idproposition INT  ,FOREIGN KEY (idquestion) REFERENCES Questions(idquestion),FOREIGN KEY (idproposition) REFERENCES Propositions(idproposition));";
                 command2.ExecuteNonQuery();
             }using(var command3 = connection.CreateCommand()){
 
-                command3.CommandText="CREATE TABLE IF NOT EXISTS Propositions ( ID	INT, fk_question	TEXT, proposition TEXT, FOREIGN KEY (fk_question) REFERENCES Questions(ID)  );";
+                command3.CommandText="CREATE TABLE IF NOT EXISTS Propositions ( idproposition	INT, proposition TEXT, idquestion INT, FOREIGN KEY (idquestion) REFERENCES Questions(idquestion));";
                 command3.ExecuteNonQuery();
             }
             connection.Close();
@@ -64,7 +77,10 @@ public class Scripte4DB : MonoBehaviour
     }
 
 
-    public static void Addanswer(int IDreponse,int fk_question, string answer )
+
+    // fonctions de gestion des données pour la partie jeux 
+
+ public static void AddQuestion(int idquestion,string question )
 
     {
 
@@ -73,7 +89,7 @@ public class Scripte4DB : MonoBehaviour
 
             using(var command = connection.CreateCommand()){
 
-                command.CommandText="INSERT INTO  Reponses (ID , fk_question, reponse ) VALUES ('" +IDreponse + "' , '" + fk_question + "' ,'" +answer+  "' ); ";
+                command.CommandText="INSERT INTO  Questions (idquestion , question ) VALUES ('" +idquestion + "' , '" + question + "'  ); ";
                 command.ExecuteNonQuery();
             }
             connection.Close();
@@ -84,7 +100,82 @@ public class Scripte4DB : MonoBehaviour
 
     }
 
-     public static string Showquestion(int IDquestion)
+    public static bool TestingQuestionExistance(string question){
+
+          using(var connection = new SqliteConnection(dbName)){
+            connection.Open();
+
+            using(var command = connection.CreateCommand()){
+
+                command.CommandText="SELECT * FROM Questions  ;" ;
+
+                using(IDataReader reader = command.ExecuteReader()){
+
+                    while(reader.Read()){
+
+
+
+                        if(String.Equals(question,(string)reader["question"])){
+
+                         return true;
+                        };
+                      
+
+
+
+                    }
+                    reader.Close();
+                }
+            }
+            connection.Close();
+            
+
+        }
+    
+    return false;
+
+
+    }
+    public static void AddReponse(int idreponse,string reponse,int idquestion,int idproposition )
+
+    {
+
+        using(var connection = new SqliteConnection(dbName)){
+            connection.Open();
+
+            using(var command = connection.CreateCommand()){
+
+                command.CommandText="INSERT INTO  Reponses (idreponse , reponse , idquestion , idproposition ) VALUES ('" +idreponse + "' , '" + reponse + "' ,'" +idquestion+  "','" +idproposition+  "' ); ";
+                command.ExecuteNonQuery();
+            }
+            connection.Close();
+
+        }
+
+
+
+    }
+
+     public static void addproposition(int idproposition,string  proposition ,int  idquestion ){
+
+
+         using(var connection = new SqliteConnection(dbName)){
+            connection.Open();
+
+            using(var command = connection.CreateCommand()){
+
+                command.CommandText="INSERT INTO  Propositions (ID ,fk_question, proposition ) VALUES ('" +idproposition + "' , '" + proposition + "' ,'" +idquestion+  "' ); ";
+                command.ExecuteNonQuery();
+            }
+            connection.Close();
+
+        }
+
+    }
+
+
+
+     public static string Showquestion(int idquestion)
     {
         
 
@@ -93,7 +184,7 @@ public class Scripte4DB : MonoBehaviour
 
             using(var command = connection.CreateCommand()){
 
-                command.CommandText="SELECT * FROM Questions WHERE ID = "+IDquestion+";";
+                command.CommandText="SELECT * FROM Questions WHERE ID = "+idquestion+";";
 
                 using(IDataReader reader = command.ExecuteReader()){
 
@@ -115,7 +206,7 @@ public class Scripte4DB : MonoBehaviour
 
 
 
-    public static List<string> groupProposition(int IDquestion){
+     public static List<string> groupProposition(int idquestion){
 
         
     
@@ -124,7 +215,7 @@ public class Scripte4DB : MonoBehaviour
 
             using(var command = connection.CreateCommand()){
 
-                command.CommandText="SELECT * FROM Propositions WHERE fk_question =" +IDquestion+ ";" ;
+                command.CommandText="SELECT * FROM Propositions WHERE idquestion =" +idquestion+ ";" ;
 
                 using(IDataReader reader = command.ExecuteReader()){
 
@@ -132,7 +223,7 @@ public class Scripte4DB : MonoBehaviour
 
 
 
-                      //TablProposition.Add((string)reader["proposition"]);
+                      TablProposition.Add((string)reader["proposition"]);
                       
 
 
@@ -184,22 +275,16 @@ public class Scripte4DB : MonoBehaviour
 
     }
 
-    public static void addproposition(int IDquestion,int fk_question,string proposition){
+    //fonction de gestion des données issue des Web Services
+
+    
+}
 
 
-         using(var connection = new SqliteConnection(dbName)){
-            connection.Open();
-
-            using(var command = connection.CreateCommand()){
-
-                command.CommandText="INSERT INTO  Propositions (ID ,fk_question, proposition ) VALUES ('" +IDquestion + "' , '" + fk_question + "' ,'" +proposition+  "' ); ";
-                command.ExecuteNonQuery();
-            }
-            connection.Close();
-
-        }
-
-    }
    
 
-}
+
+
+   
+
+   

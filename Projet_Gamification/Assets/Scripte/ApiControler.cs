@@ -1,3 +1,5 @@
+
+using System.Data;
 using System.Security.AccessControl;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,11 +16,14 @@ public class ApiControler : MonoBehaviour
   
   
     
-
-
-    public  List<Question> listquestions;
+    //List avec les questions issue de la base de donné jhipster 
+   public  List<Question> listquestions;
+    
     public  List<Proposition> listpropositions;
     public  List<Reponse> listreponses;
+
+    public bool ConnectionStatus=false;
+ 
 
     public static readonly string ApiURL ="http://localhost:8081/api/";
     public static string APIkey="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJST0xFX0FETUlOLFJPTEVfVVNFUiIsImV4cCI6MTYyODE2Mjc3OH0.VX7EVwYLKEpYKQXkKRsD6AjRlIqbi3OyPRpKS-kT1JkjPpUi8AkaBmGgAlqXLdjQd7LwOe0gwoUOCajAVMma7A";
@@ -26,10 +31,23 @@ public class ApiControler : MonoBehaviour
 
     void Start(){
 
-        StartCoroutine(MappingQuestions(listquestions));
-        StartCoroutine(MappingPropositions(listpropositions));
-        Reponse rep=new Reponse(21165,11,11);
-        StartCoroutine( InverseMappingReponse(rep));
+          StartCoroutine(checkInternetConnection(ConnectionStatus));
+          ConnectionStatus=false;
+        if(!ConnectionStatus){
+
+            StartCoroutine(MappingQuestions());
+
+        }else{
+            UnityEngine.Debug.Log("Connection faild");
+        }
+
+        
+       
+        //StartCoroutine(MappingPropositions(listpropositions));
+        //Reponse rep=new Reponse(21165,11,11);
+       
+        //StartCoroutine( InverseMappingReponse(rep));
+
 
     }
 
@@ -37,7 +55,7 @@ public class ApiControler : MonoBehaviour
     
 
 
-    IEnumerator MappingQuestions(List<Question> listDesQuestions){
+    IEnumerator MappingQuestions(){
 
         string ApiQuestionURL= ApiURL +"questions";
 
@@ -66,21 +84,30 @@ public class ApiControler : MonoBehaviour
 
         
 
-        for (int i = 0 ; i < Questioninfo.Count -1 ; i++){
+        for (int i = 0 ; i < Questioninfo.Count  ; i++){
            
 
             Question qs = new Question(int.Parse(Questioninfo[i]["idquestion"]),Questioninfo[i]["question"]);
-            listDesQuestions.Add(qs);
+
+            if(!Scripte4DB.TestingQuestionExistance(qs.question)){
+
+                Scripte4DB.AddQuestion(qs.idquestion,qs.question );               
+
+            }else
+            {
+                 UnityEngine.Debug.Log(qs.question+"dèjà éxiste");
+            }
+
+               
+            
 
 
         }
 
-        UnityEngine.Debug.Log(listDesQuestions[0].idquestion);
-        UnityEngine.Debug.Log(listDesQuestions[0].question);
+       
         
-
-
-
+       
+        
 
     }
 
@@ -139,7 +166,7 @@ public class ApiControler : MonoBehaviour
 
 
         string jsonquestion=JsonUtility.ToJson(reponse);
-
+      
         var request = new UnityWebRequest(ApiReponseURL, "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonquestion);
         request.uploadHandler = (UploadHandler) new UploadHandlerRaw(bodyRaw);
@@ -153,6 +180,19 @@ public class ApiControler : MonoBehaviour
 
 
     }
+
+     IEnumerator checkInternetConnection(bool action)
+    {
+        WWW www = new WWW("http://google.com");
+        yield return www;
+        if (www.error != null) {
+            action=false;
+        } else {
+            action=true;
+        }
+    }
+
+  
 
 
 
