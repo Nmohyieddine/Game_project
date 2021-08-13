@@ -1,3 +1,5 @@
+using System.Net.Mime;
+using System.Xml.Linq;
 using System.Collections.Generic;
 using System.Collections;
 using System;
@@ -12,13 +14,14 @@ using UnityEngine.UI;
 public class Scripte4DB : MonoBehaviour
 {
 
-    private static string dbName =@"Data Source=C:\Users\zmiloudi\Desktop\Game_project\Projet_Gamification\Assets\Scripte\QuesionsDB.db,Version=3";
+    //private static string dbName=@"Data Source=C:\Users\zmiloudi\Desktop\Game_project\Projet_Gamification\Assets\Scripte\QuestionDB.db";
     public static string Val;
     public static int nbr_reponse;
     public static List<String> TablProposition;
+    private static string dbName;
 
-   
-   
+
+    
 
 
 
@@ -26,8 +29,11 @@ public class Scripte4DB : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        dbName="URI=file:" + Application.persistentDataPath + "/QuestionDB.db";
+
         CreateDB();
         TestingQuestionExistance("hello");
+        UnityEngine.Debug.Log(Application.persistentDataPath);
         
         
         
@@ -64,7 +70,7 @@ public class Scripte4DB : MonoBehaviour
                 command1.ExecuteNonQuery();
             }using(var command2 = connection.CreateCommand()){
 
-                command2.CommandText="CREATE TABLE IF NOT EXISTS Reponses ( idreponse	INT, reponse TEXT, idquestion INT, idproposition INT  ,FOREIGN KEY (idquestion) REFERENCES Questions(idquestion),FOREIGN KEY (idproposition) REFERENCES Propositions(idproposition));";
+                command2.CommandText="CREATE TABLE IF NOT EXISTS Reponses ( idreponse	INT , idquestion INT, idproposition INT  ,FOREIGN KEY (idquestion) REFERENCES Questions(idquestion),FOREIGN KEY (idproposition) REFERENCES Propositions(idproposition));";
                 command2.ExecuteNonQuery();
             }using(var command3 = connection.CreateCommand()){
 
@@ -136,7 +142,44 @@ public class Scripte4DB : MonoBehaviour
 
 
     }
-    public static void AddReponse(int idreponse,string reponse,int idquestion,int idproposition )
+
+     public static bool TestingPropositionExistance(string proposition){
+
+          using(var connection = new SqliteConnection(dbName)){
+            connection.Open();
+
+            using(var command = connection.CreateCommand()){
+
+                command.CommandText="SELECT * FROM Propositions  ;" ;
+
+                using(IDataReader reader = command.ExecuteReader()){
+
+                    while(reader.Read()){
+
+
+
+                        if(String.Equals(proposition,(string)reader["proposition"])){
+
+                         return true;
+                        };
+                      
+
+
+
+                    }
+                    reader.Close();
+                }
+            }
+            connection.Close();
+            
+
+        }
+    
+    return false;
+
+
+    }
+    public static void AddReponse(int idreponse,int idquestion,int idproposition )
 
     {
 
@@ -145,7 +188,7 @@ public class Scripte4DB : MonoBehaviour
 
             using(var command = connection.CreateCommand()){
 
-                command.CommandText="INSERT INTO  Reponses (idreponse , reponse , idquestion , idproposition ) VALUES ('" +idreponse + "' , '" + reponse + "' ,'" +idquestion+  "','" +idproposition+  "' ); ";
+                command.CommandText="INSERT INTO  Reponses (idreponse , idquestion , idproposition ) VALUES ('" +idreponse + "'  ,'" +idquestion+  "','" +idproposition+  "' ); ";
                 command.ExecuteNonQuery();
             }
             connection.Close();
@@ -164,7 +207,7 @@ public class Scripte4DB : MonoBehaviour
 
             using(var command = connection.CreateCommand()){
 
-                command.CommandText="INSERT INTO  Propositions (ID ,fk_question, proposition ) VALUES ('" +idproposition + "' , '" + proposition + "' ,'" +idquestion+  "' ); ";
+                command.CommandText="INSERT INTO  Propositions (idproposition ,proposition, idquestion ) VALUES ('" +idproposition + "' , '" + proposition + "' ,'" +idquestion+  "' ); ";
                 command.ExecuteNonQuery();
             }
             connection.Close();
@@ -184,7 +227,7 @@ public class Scripte4DB : MonoBehaviour
 
             using(var command = connection.CreateCommand()){
 
-                command.CommandText="SELECT * FROM Questions WHERE ID = "+idquestion+";";
+                command.CommandText="SELECT * FROM Questions WHERE idquestion = "+idquestion+";";
 
                 using(IDataReader reader = command.ExecuteReader()){
 
@@ -240,6 +283,42 @@ public class Scripte4DB : MonoBehaviour
 
 
     }
+    public static List<Reponse> groupReponses(){
+
+        
+        List<Reponse> ListReponses=new List<Reponse>();
+        using(var connection = new SqliteConnection(dbName)){
+            connection.Open();
+
+            using(var command = connection.CreateCommand()){
+
+                command.CommandText="SELECT * FROM Reponses ;" ;
+
+                using(IDataReader reader = command.ExecuteReader()){
+
+                    while(reader.Read()){
+
+
+                        Reponse rp=new Reponse((int)reader["idreponse"],(int)reader["idproposition"],(int)reader["idquestion"]);
+                        ListReponses.Add(rp);
+                      
+
+
+
+                    }
+                    reader.Close();
+                }
+            }
+            connection.Close();
+            
+
+        }
+    return ListReponses;
+
+
+    }
+
+    
 
 
 
@@ -275,7 +354,7 @@ public class Scripte4DB : MonoBehaviour
 
     }
 
-    //fonction de gestion des données issue des Web Services
+    
 
     
 }

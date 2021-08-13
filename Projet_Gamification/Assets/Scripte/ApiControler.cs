@@ -23,30 +23,42 @@ public class ApiControler : MonoBehaviour
     public  List<Reponse> listreponses;
 
     public bool ConnectionStatus=false;
+    public int h=0;
  
 
     public static readonly string ApiURL ="http://localhost:8081/api/";
-    public static string APIkey="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJST0xFX0FETUlOLFJPTEVfVVNFUiIsImV4cCI6MTYyODE2Mjc3OH0.VX7EVwYLKEpYKQXkKRsD6AjRlIqbi3OyPRpKS-kT1JkjPpUi8AkaBmGgAlqXLdjQd7LwOe0gwoUOCajAVMma7A";
+    public static string APIkey="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJST0xFX0FETUlOLFJPTEVfVVNFUiIsImV4cCI6MTYyODc2NzE1NX0.mwbh3shn0_1AhGxtoRTQKo_BQYsrpzJa_kljspMPBa724LpXYpNIuZeOtpJ_eB3C6LdaQLZc2HkVlPypXwDWUw";
     
 
     void Start(){
 
-          StartCoroutine(checkInternetConnection(ConnectionStatus));
-          ConnectionStatus=false;
-        if(!ConnectionStatus){
-
-            StartCoroutine(MappingQuestions());
+        List<Reponse> ListNotExisting =new List<Reponse>();
+        
+        
+        
+         if(Application.internetReachability == NetworkReachability.NotReachable)
+        {
+            UnityEngine.Debug.Log("Error. Check internet connection!");
 
         }else{
-            UnityEngine.Debug.Log("Connection faild");
-        }
 
-        
-       
-        //StartCoroutine(MappingPropositions(listpropositions));
-        //Reponse rep=new Reponse(21165,11,11);
-       
-        //StartCoroutine( InverseMappingReponse(rep));
+            //StartCoroutine(MappingQuestions());
+            //StartCoroutine(MappingPropositions());
+            StartCoroutine(CheckReponseExixtance(ListNotExisting));
+            
+                StartCoroutine(InverseMappingReponse(ListNotExisting[1]));
+                        
+
+
+            
+
+            
+            
+
+            
+          
+
+        }
 
 
     }
@@ -61,17 +73,13 @@ public class ApiControler : MonoBehaviour
 
          UnityWebRequest QuestionsInfoRequest = UnityWebRequest.Get(ApiQuestionURL);
 
-        /*  Authentification:
-
-            QuestionsInfoRequest.SetRequestHeader('Authorization :','Bearer '+ APIkey );
-
-            ou
-
-             UnityWebRequest QuestionsInfoRequest = UnityWebRequest.Get(AVWXURL + "?token="+yourAPIKey);
-
-        */
-      
        
+        //Authentification token
+        QuestionsInfoRequest.SetRequestHeader("Authorization", "Bearer " + APIkey);
+        QuestionsInfoRequest.SetRequestHeader("Content-Type", "application/json");
+
+
+
         yield return QuestionsInfoRequest.SendWebRequest();
 
         if(QuestionsInfoRequest.isNetworkError || QuestionsInfoRequest.isHttpError){
@@ -112,23 +120,19 @@ public class ApiControler : MonoBehaviour
     }
 
 
-    IEnumerator MappingPropositions(List<Proposition> listDesPropositions){
+    IEnumerator MappingPropositions(){
 
         string ApiPropositionURL= ApiURL +"propositions";
 
          UnityWebRequest PropositionsInfoRequest = UnityWebRequest.Get(ApiPropositionURL);
 
-        /*  Authentification:
+        
+        //Authentification token      
+        PropositionsInfoRequest.SetRequestHeader("Authorization", "Bearer " + APIkey);
+        PropositionsInfoRequest.SetRequestHeader("Content-Type", "application/json");
 
-            PropositionsInfoRequest.SetRequestHeader('Authorization :','Bearer '+ APIkey );
 
-            ou
 
-             UnityWebRequest PropositionsInfoRequest = UnityWebRequest.Get(AVWXURL + "?token="+yourAPIKey);
-
-        */
-      
-       
         yield return PropositionsInfoRequest.SendWebRequest();
 
         if(PropositionsInfoRequest.isNetworkError || PropositionsInfoRequest.isHttpError){
@@ -141,18 +145,24 @@ public class ApiControler : MonoBehaviour
 
         
 
-        for (int i = 0 ; i < Propositioninfo.Count -1 ; i++){
+        for (int i = 0 ; i < Propositioninfo.Count  ; i++){
            
 
             Proposition prop = new Proposition(int.Parse(Propositioninfo[i]["idpropositions"]),Propositioninfo[i]["proposition"],Propositioninfo[i]["questionsIdquestion"]);
-            listDesPropositions.Add(prop);
+             if(!Scripte4DB.TestingPropositionExistance(prop.proposition)){
+
+                Scripte4DB.addproposition(prop.idproposition,prop.proposition,prop.idquestion );               
+
+            }else
+            {
+                UnityEngine.Debug.Log(prop.proposition+"dèjà éxiste");
+            }
+
 
 
         }
 
-        UnityEngine.Debug.Log(listDesPropositions[0].idproposition);
-        UnityEngine.Debug.Log(listDesPropositions[0].proposition);
-        UnityEngine.Debug.Log(listDesPropositions[0].idquestion);
+       
 
 
 
@@ -160,18 +170,22 @@ public class ApiControler : MonoBehaviour
 
     
 
+
      IEnumerator InverseMappingReponse(Reponse reponse){
 
-          string ApiReponseURL= ApiURL +"reponses";
+        string ApiReponseURL= ApiURL +"reponses";
 
 
         string jsonquestion=JsonUtility.ToJson(reponse);
-      
         var request = new UnityWebRequest(ApiReponseURL, "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonquestion);
         request.uploadHandler = (UploadHandler) new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = (DownloadHandler) new DownloadHandlerBuffer();
+        
+        //Authentification token 
+        request.SetRequestHeader("Authorization", "Bearer " + APIkey);
         request.SetRequestHeader("Content-Type", "application/json");
+
         yield return request.SendWebRequest();
         Debug.Log("Status Code: " + request.responseCode);
 
@@ -181,16 +195,101 @@ public class ApiControler : MonoBehaviour
 
     }
 
-     IEnumerator checkInternetConnection(bool action)
-    {
-        WWW www = new WWW("http://google.com");
-        yield return www;
-        if (www.error != null) {
-            action=false;
-        } else {
-            action=true;
+
+
+    //this fonction check if a Reponse exist in the Backoffice Data base
+
+    IEnumerator CheckReponseExixtance(List<Reponse> ListReponseNotExist){
+
+        string ApiPropositionURL= ApiURL +"reponses";
+
+         UnityWebRequest ReponsesInfoRequest = UnityWebRequest.Get(ApiPropositionURL);
+
+        /*  Authentification:
+
+            ReponsesInfoRequest.SetRequestHeader('Authorization :','Bearer '+ APIkey );
+
+            ou
+
+             UnityWebRequest ReponsesInfoRequest = UnityWebRequest.Get(AVWXURL + "?token="+yourAPIKey);
+
+        */ 
+        
+        
+        ReponsesInfoRequest.SetRequestHeader("Authorization", "Bearer " + APIkey);
+        ReponsesInfoRequest.SetRequestHeader("Content-Type", "application/json");
+      
+       
+        yield return ReponsesInfoRequest.SendWebRequest();
+
+        if(ReponsesInfoRequest.isNetworkError || ReponsesInfoRequest.isHttpError){
+
+            UnityEngine.Debug.LogError(ReponsesInfoRequest);
+            yield break;
         }
+
+        JSONNode Reponseinfo = JSON.Parse(ReponsesInfoRequest.downloadHandler.text);
+        
+        // mapping object relationnel
+
+        //List<Reponse> ListReponsesDb=Scripte4DB.groupReponses();
+        List<Reponse> ListReponsesDb=new List<Reponse>();
+        Reponse rp1=new Reponse(2222,2,5);
+        Reponse rp2=new Reponse(2223,11,11);
+        Reponse rp3=new Reponse(2224,2,5);
+        Reponse rp4=new Reponse(2222,2,5);
+
+
+        ListReponsesDb.Add(rp1);
+        ListReponsesDb.Add(rp2);
+        ListReponsesDb.Add(rp3);
+        ListReponsesDb.Add(rp4);
+        
+        
+        //
+
+        UnityEngine.Debug.Log(ListReponsesDb.Count);
+                    
+
+
+        for (int i = 0 ; i <ListReponsesDb.Count  ; i++){
+            
+            for(int j=0;j<Reponseinfo.Count;j++){
+                
+
+                if(Reponseinfo[j]["idreponse"]==ListReponsesDb[i].idreponse){
+                    
+                    UnityEngine.Debug.Log("existe");
+                    
+
+
+                }else
+                {
+
+                    h++;
+                    
+                
+                }
+               
+                
+            }
+             if(h==Reponseinfo.Count){
+
+                ListReponseNotExist.Add(ListReponsesDb[i]);
+                UnityEngine.Debug.Log("don't existe");
+                
+
+
+            }
+            h=0;
+            
+
+            
+        }
+
     }
+
+
 
   
 
