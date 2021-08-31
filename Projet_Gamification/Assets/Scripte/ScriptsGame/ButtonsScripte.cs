@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class ButtonsScripte : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class ButtonsScripte : MonoBehaviour
     public GameObject PanelExplication;
 
     public GameObject PausePanel;
+
+    
 
 
     public Text quizQuestion;
@@ -84,4 +87,14 @@ public class ButtonsScripte : MonoBehaviour
 
 
     }
+
+
+    public void restartButton(){
+
+        SceneManager.LoadScene("level1");
+
+
+    }
+
+  
 }

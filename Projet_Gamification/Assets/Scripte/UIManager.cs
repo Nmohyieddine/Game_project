@@ -34,4 +34,12 @@ public class UIManager : MonoBehaviour
         loginUI.SetActive(false);
         registerUI.SetActive(true);
     }
+    public void ClosseLogin(){
+
+        loginUI.SetActive(false);
+    }
+
+    public void ButtonAccount(){
+        loginUI.SetActive(true);
+    }
 }

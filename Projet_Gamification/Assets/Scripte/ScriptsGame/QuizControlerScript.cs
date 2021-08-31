@@ -11,11 +11,16 @@ public class QuizControlerScript : MonoBehaviour
     public Text quizQuestion;
 
     public Text[] TextButtons;
+    
+
 
     int i=1;
+    public static int idreponse=0;
 
     void Start()
     {
+
+       
         
     }
 
@@ -27,6 +32,9 @@ public class QuizControlerScript : MonoBehaviour
 
     public void iniButton(){
         List<string> answer=Scripte4DB.groupProposition(i);
+       
+
+       
 
         for(int i=0;i<button.Length;i++){
 
@@ -45,12 +53,42 @@ public class QuizControlerScript : MonoBehaviour
 
     public void Xbutton(){
 
+        
+        List<string> Ques=Scripte4DB.groupQuestion();
+
         Panelquiz.SetActive(true);
+        //iniButton();
         Time.timeScale = 0f;
-        quizQuestion.text=Scripte4DB.Showquestion(i);
+        quizQuestion.text=Ques[i];
+
         i++;
 
 
 
+    }
+
+    public void OuiButton(){
+
+        List<int> IdQues=Scripte4DB.groupIdQuestion();
+
+        Scripte4DB.AddReponse(idreponse,IdQues[i],1);
+        idreponse++;
+        Panelquiz.SetActive(false);
+        Time.timeScale = 1f;
+
+
+    }
+
+    public void NonButton(){
+        
+        List<int> IdQues=Scripte4DB.groupIdQuestion();
+
+        Scripte4DB.AddReponse(idreponse,IdQues[i],0);
+
+        idreponse++;
+        Panelquiz.SetActive(false);
+        Time.timeScale = 1f;
+
+        
     }
 }

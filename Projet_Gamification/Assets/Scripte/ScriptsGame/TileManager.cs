@@ -10,6 +10,8 @@ public class TileManager : MonoBehaviour
 
     public Transform Trantile1;
 
+    
+
     //public GameObject titlefirst;
 
     // Start is called before the first frame update
@@ -20,15 +22,31 @@ public class TileManager : MonoBehaviour
     public Transform transformPlayer;
 
 
-    int k=0;
 
- 
+
+    public int k=0;
 
     public bool accesframe ; 
 
     public List<GameObject> activeTiles = new List<GameObject>();
 
     public int posCreation =10;
+
+
+
+    public GameObject WinPanel;
+    public static int NombrTile ;
+    public int NombreDeRoute=2; 
+
+
+
+    public GameObject ServicePanel;
+
+
+
+       
+       
+    
 
 
     
@@ -38,31 +56,73 @@ public class TileManager : MonoBehaviour
         
         
        
-
+         //winPanel.SetActive(false);
         SpawnTile(0,150);
+
+
         
 
     }
  
     
 
-    void Update()
+    void FixedUpdate()
     {
 
     
-        if(transformPlayer.position.z > posCreation)
-        {
+            if(transformPlayer.position.z > posCreation)
+            {
 
-            SpawnTile(UnityEngine.Random.Range(0,tilePrefabs.Length));
-            posCreation+=300;
-            k++;
-            if(k>1){
-                DelectTile();
-            }
+                SpawnTile(UnityEngine.Random.Range(0,tilePrefabs.Length));
+                
+
+                posCreation+=300;
+                k++;
+                //inscrementation du nombre de tile
             
+
+                if(k>1){
+
+                    DelectTile();
+                    NombrTile++;
+                }
+                
+            }
+
+            ActiveWinPanel();
+
+
+    
+
+         
+      
+
+
+
+    }  
+
+    public void ActiveWinPanel(){
+        if(NombrTile == NombreDeRoute){
+
+            WinPanel.SetActive(true);
+            Time.timeScale = 0f;
+            NombrTile=0;
+
+
+
+
+
         }
 
+
+
+
+
     }
+   
+
+
+    
 
 
     public void SpawnTile(int tileIndex)
@@ -77,7 +137,7 @@ public class TileManager : MonoBehaviour
     }
     public void SpawnTile(int tileIndex,int possition){
 
-         GameObject go=Instantiate(tilePrefabs[tileIndex],transform.forward*possition,transform.rotation);
+        GameObject go=Instantiate(tilePrefabs[tileIndex],transform.forward*possition,transform.rotation);
         
         zSpaw +=titleLentgth;
 
@@ -90,6 +150,17 @@ public class TileManager : MonoBehaviour
 
         Destroy(activeTiles[0]);
         activeTiles.RemoveAt(0);
+
+    }
+
+      public void choiseService(){
+
+        WinPanel.SetActive(false);  
+        ServicePanel.SetActive(true);
+
+
+
+
 
     }
 

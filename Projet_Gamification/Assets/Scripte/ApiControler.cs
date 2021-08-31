@@ -27,7 +27,7 @@ public class ApiControler : MonoBehaviour
  
 
     public static readonly string ApiURL ="http://localhost:8081/api/";
-    public static string APIkey="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJST0xFX0FETUlOLFJPTEVfVVNFUiIsImV4cCI6MTYyODc2NzE1NX0.mwbh3shn0_1AhGxtoRTQKo_BQYsrpzJa_kljspMPBa724LpXYpNIuZeOtpJ_eB3C6LdaQLZc2HkVlPypXwDWUw";
+    public static string APIkey="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJST0xFX0FETUlOLFJPTEVfVVNFUiIsImV4cCI6MTYyOTgxMzM1OX0.O9e63vJ-DHpfYCQz21AmegNKnOKCrHGbpb_R8ZqsELw4PyTHOj0VqRkmpEqh3JdkzGIw_n9I4QJyLIWkvfwcUw";
     
 
     void Start(){
@@ -42,11 +42,15 @@ public class ApiControler : MonoBehaviour
 
         }else{
 
-            //StartCoroutine(MappingQuestions());
-            //StartCoroutine(MappingPropositions());
-            StartCoroutine(CheckReponseExixtance(ListNotExisting));
+            StartCoroutine(MappingQuestions());
+            StartCoroutine(MappingPropositions());
+
+
+            //StartCoroutine(CheckReponseExixtance(ListNotExisting));
+
+            //showreponses(ListNotExisting);
             
-                StartCoroutine(InverseMappingReponse(ListNotExisting[1]));
+            //StartCoroutine(InverseMappingReponse(ListNotExisting[1]));
                         
 
 
@@ -64,7 +68,14 @@ public class ApiControler : MonoBehaviour
     }
 
     
-    
+    public void showreponses(List<Reponse> listReponse)   {
+
+        for(int i=0;i<listReponse.Count;i++){
+
+            UnityEngine.Debug.Log(listReponse[i].idreponse);
+            UnityEngine.Debug.Log(listReponse[i].propositionId);
+        }
+    }
 
 
     IEnumerator MappingQuestions(){
@@ -148,7 +159,7 @@ public class ApiControler : MonoBehaviour
         for (int i = 0 ; i < Propositioninfo.Count  ; i++){
            
 
-            Proposition prop = new Proposition(int.Parse(Propositioninfo[i]["idpropositions"]),Propositioninfo[i]["proposition"],Propositioninfo[i]["questionsIdquestion"]);
+            Proposition prop = new Proposition(Propositioninfo[i]["idpropositions"],Propositioninfo[i]["proposition"],Propositioninfo[i]["questionsIdquestion"]);
              if(!Scripte4DB.TestingPropositionExistance(prop.proposition)){
 
                 Scripte4DB.addproposition(prop.idproposition,prop.proposition,prop.idquestion );               
@@ -172,6 +183,9 @@ public class ApiControler : MonoBehaviour
 
 
      IEnumerator InverseMappingReponse(Reponse reponse){
+
+
+         
 
         string ApiReponseURL= ApiURL +"reponses";
 
@@ -232,20 +246,9 @@ public class ApiControler : MonoBehaviour
         
         // mapping object relationnel
 
-        //List<Reponse> ListReponsesDb=Scripte4DB.groupReponses();
-        List<Reponse> ListReponsesDb=new List<Reponse>();
-        Reponse rp1=new Reponse(2222,2,5);
-        Reponse rp2=new Reponse(2223,11,11);
-        Reponse rp3=new Reponse(2224,2,5);
-        Reponse rp4=new Reponse(2222,2,5);
-
-
-        ListReponsesDb.Add(rp1);
-        ListReponsesDb.Add(rp2);
-        ListReponsesDb.Add(rp3);
-        ListReponsesDb.Add(rp4);
-        
-        
+        List<Reponse> ListReponsesDb=Scripte4DB.groupReponses();
+        //List<Reponse> ListReponsesDb=new List<Reponse>();
+             
         //
 
         UnityEngine.Debug.Log(ListReponsesDb.Count);

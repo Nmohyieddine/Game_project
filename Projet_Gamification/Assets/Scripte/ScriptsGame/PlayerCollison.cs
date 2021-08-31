@@ -23,6 +23,13 @@ public class PlayerCollison : MonoBehaviour {
 	public GameObject PausePanel;
 
 
+	public GameObject GameoverPanel;
+
+
+
+	
+
+
 
 	public Text Textetoile;
 
@@ -63,6 +70,8 @@ public class PlayerCollison : MonoBehaviour {
 
 			playerMouvement.enabled = false ;
 			UnityEngine.Debug.Log("taxi");
+		
+
 
 
 		}
@@ -72,6 +81,9 @@ public class PlayerCollison : MonoBehaviour {
 
 			playerMouvement.enabled = false ;
 			UnityEngine.Debug.Log("bus");
+			GameoverPanel.SetActive(true);
+
+			
 
 
 		}
@@ -101,25 +113,6 @@ public class PlayerCollison : MonoBehaviour {
 
 				}
 
-				//quizQuestion.text=Scripte4DB.Showquestion(1);
-
-
-			
-
-				//quizPanel.SetActive(true);
-
-
-				
-
-
-
-
-
-				
-
-				
-
-				
 
 			}if(other.gameObject.layer == 11){
 
@@ -129,8 +122,11 @@ public class PlayerCollison : MonoBehaviour {
 
 			}
 
+		
+
 
 	}
+	
 
 	
 

@@ -32,10 +32,11 @@ public class Scripte4DB : MonoBehaviour
         dbName="URI=file:" + Application.persistentDataPath + "/QuestionDB.db";
 
         CreateDB();
-        TestingQuestionExistance("hello");
-        UnityEngine.Debug.Log(Application.persistentDataPath);
+        
+       
         
         
+
         
         
         
@@ -70,11 +71,11 @@ public class Scripte4DB : MonoBehaviour
                 command1.ExecuteNonQuery();
             }using(var command2 = connection.CreateCommand()){
 
-                command2.CommandText="CREATE TABLE IF NOT EXISTS Reponses ( idreponse	INT , idquestion INT, idproposition INT  ,FOREIGN KEY (idquestion) REFERENCES Questions(idquestion),FOREIGN KEY (idproposition) REFERENCES Propositions(idproposition));";
+                command2.CommandText="CREATE TABLE IF NOT EXISTS Reponses ( idreponse	INT , idquestion INT, idproposition INT );";
                 command2.ExecuteNonQuery();
             }using(var command3 = connection.CreateCommand()){
 
-                command3.CommandText="CREATE TABLE IF NOT EXISTS Propositions ( idproposition	INT, proposition TEXT, idquestion INT, FOREIGN KEY (idquestion) REFERENCES Questions(idquestion));";
+                command3.CommandText="CREATE TABLE IF NOT EXISTS Propositions ( idproposition	INT, proposition TEXT, idquestion INT);";
                 command3.ExecuteNonQuery();
             }
             connection.Close();
@@ -106,6 +107,46 @@ public class Scripte4DB : MonoBehaviour
 
     }
 
+
+
+     public static void AddReponse(int idreponse,int idquestion,int idproposition ){
+
+        using(var connection = new SqliteConnection(dbName)){
+            connection.Open();
+
+            using(var command = connection.CreateCommand()){
+
+                command.CommandText="INSERT INTO  Reponses (idreponse , idquestion , idproposition ) VALUES ('" +idreponse + "'  ,'" + idquestion +  "','" + idproposition +  "' ); ";
+                command.ExecuteNonQuery();
+            }
+            connection.Close();
+
+        }
+
+
+
+    }
+
+
+    
+     public static void addproposition(int idproposition,string  proposition ,int  idquestion ){
+
+
+         using(var connection = new SqliteConnection(dbName)){
+            connection.Open();
+
+            using(var command = connection.CreateCommand()){
+
+                command.CommandText="INSERT INTO  Propositions (idproposition ,proposition, idquestion ) VALUES ('" +idproposition + "' , '" + proposition + "' ,'" +idquestion+  "' ); ";
+                command.ExecuteNonQuery();
+            }
+            connection.Close();
+
+        }
+
+    }
+
+
     public static bool TestingQuestionExistance(string question){
 
           using(var connection = new SqliteConnection(dbName)){
@@ -122,6 +163,7 @@ public class Scripte4DB : MonoBehaviour
 
 
                         if(String.Equals(question,(string)reader["question"])){
+                            UnityEngine.Debug.Log("exist");
 
                          return true;
                         };
@@ -179,42 +221,8 @@ public class Scripte4DB : MonoBehaviour
 
 
     }
-    public static void AddReponse(int idreponse,int idquestion,int idproposition )
-
-    {
-
-        using(var connection = new SqliteConnection(dbName)){
-            connection.Open();
-
-            using(var command = connection.CreateCommand()){
-
-                command.CommandText="INSERT INTO  Reponses (idreponse , idquestion , idproposition ) VALUES ('" +idreponse + "'  ,'" +idquestion+  "','" +idproposition+  "' ); ";
-                command.ExecuteNonQuery();
-            }
-            connection.Close();
-
-        }
-
-
-
-    }
-
-     public static void addproposition(int idproposition,string  proposition ,int  idquestion ){
-
-
-         using(var connection = new SqliteConnection(dbName)){
-            connection.Open();
-
-            using(var command = connection.CreateCommand()){
-
-                command.CommandText="INSERT INTO  Propositions (idproposition ,proposition, idquestion ) VALUES ('" +idproposition + "' , '" + proposition + "' ,'" +idquestion+  "' ); ";
-                command.ExecuteNonQuery();
-            }
-            connection.Close();
-
-        }
-
-    }
+   
+    
 
 
 
@@ -233,7 +241,7 @@ public class Scripte4DB : MonoBehaviour
 
                     while(reader.Read()){
 
-                      return (string)reader["question"];
+                      string Val=(string)reader["question"];
 
                     }
                     reader.Close();
@@ -244,6 +252,77 @@ public class Scripte4DB : MonoBehaviour
         }
 
     return Val;
+
+    }
+    
+
+     public static List<string> groupQuestion(){
+
+        
+        List<string> Tablquestion=new List<string>();
+        using(var connection = new SqliteConnection(dbName)){
+            connection.Open();
+
+            using(var command = connection.CreateCommand()){
+
+                command.CommandText="SELECT * FROM Questions ;" ;
+
+                using(IDataReader reader = command.ExecuteReader()){
+
+                    while(reader.Read()){
+
+
+
+                      Tablquestion.Add((string)reader["question"]);
+                      
+
+
+
+                    }
+                    reader.Close();
+                }
+            }
+            connection.Close();
+            
+
+        }
+    return Tablquestion;
+
+
+    }
+
+    public static List<int> groupIdQuestion(){
+
+        
+        List<int> Tablquestion=new List<int>();
+        using(var connection = new SqliteConnection(dbName)){
+            connection.Open();
+
+            using(var command = connection.CreateCommand()){
+
+                command.CommandText="SELECT * FROM Questions ;" ;
+
+                using(IDataReader reader = command.ExecuteReader()){
+
+                    while(reader.Read()){
+
+
+
+                      Tablquestion.Add((int)reader["idquestion"]);
+                      
+
+
+
+                    }
+                    reader.Close();
+                }
+            }
+            connection.Close();
+            
+
+        }
+    return Tablquestion;
+
 
     }
 

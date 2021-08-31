@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 637937208288879386}
   - component: {fileID: 613062635746481938}
   - component: {fileID: 593867389129847209}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: bus
   m_TagString: bus
   m_Icon: {fileID: 0}
@@ -90,7 +90,7 @@ GameObject:
   - component: {fileID: 590643486694484794}
   - component: {fileID: 596053578209075788}
   - component: {fileID: 607618510621023580}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: jalan
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -171,7 +171,7 @@ GameObject:
   - component: {fileID: 589076751468702844}
   - component: {fileID: 597298664568178118}
   - component: {fileID: 607432777689412202}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: body_bus
   m_TagString: Untagged
   m_Icon: {fileID: 0}

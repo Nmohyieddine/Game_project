@@ -13,6 +13,7 @@ public class PanelScripte : MonoBehaviour
 
 
 
+
     void Start()
     {
         //StartPanel.SetActive(false);
@@ -28,6 +29,10 @@ public class PanelScripte : MonoBehaviour
     void FixedUpdate()
     {
         ActivepopupPanel();
+       
+        UnityEngine.Debug.Log(TileManager.NombrTile);
+        
+
     }
 
     public void ActivepopupPanel(){
@@ -41,5 +46,6 @@ public class PanelScripte : MonoBehaviour
         }
     }
 
+    
 
 }
